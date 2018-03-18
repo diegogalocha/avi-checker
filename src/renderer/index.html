@@ -8,11 +8,7 @@
   <link rel="stylesheet" type="text/css" href="../assets/css/main.css">
 </head>
 <body>
-    <header class="toolbar toolbar-header">
-        <h1 class="title">AVI Checker</h1>
-    </header>
-
-    <div id="page1" class="window-content avi-content hidden">
+    <div id="page1" class="window-content avi-content">
         <h1>Bienvenido a Avi Checker</h1>
         <p>Seleccione un archivo con el formato adecuado para iniciar el programa</p>
         <div class="select-input">    
@@ -27,11 +23,11 @@
         <h1>Excel cargado correctamente</h1>
         <p>A continuación puede ver una lista de los archivos caducados.</p>
     </div>
-    <div id="page3" class="window-content avi-content">
+    <div id="page3" class="window-content avi-content hidden">
         <div class="row bar-code-selector">
             <div class="bar-input">
                 <label for="bar-code">Use el lector de código de barras para hacer una búsqueda</label>
-                <input name="bar-code" type="text">
+                <input id="bar-code" name="bar-code" type="text">
             </div>
             <div class="message-box-container">
                 <div class="message-box">

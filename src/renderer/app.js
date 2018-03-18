@@ -3,6 +3,7 @@ window.addEventListener('load', () => {
 
 	let previousButton = document.getElementById('previous')
 	let nextButton = document.getElementById('next')
+	let xlfInput = document.getElementById('xlf')
 
 	previousButton.addEventListener('click', function(){
 	    goToPage(false);
@@ -10,6 +11,10 @@ window.addEventListener('load', () => {
 
 	nextButton.addEventListener('click', function(){
 	    goToPage(true);
+	});
+
+	xlfInput.addEventListener('change', function(event) {
+        var file = xlfInput.files[0];
 	});
 })
 
@@ -30,4 +35,9 @@ function goToPage(isNext) {
 	}
 
 	localStorage.setItem('page', movement)
+
+	// Si el paso es a la página 3, ponemos el focus al input del selector de barCode
+	if (movement === 3) {
+		document.getElementById("bar-code").focus();
+	}
 };
