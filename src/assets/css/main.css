@@ -1,6 +1,7 @@
 body {
-	background-color: pink;
+	background-color: #b5007c;
 	font-size: 15px;
+    color: white;
 }
 
 .window-content {
@@ -15,7 +16,7 @@ body {
     margin: 0 auto;
     align-items: center;
     height: 100%;
-    background-color: rgba(247, 244, 244, 0.3);
+    background-color: rgba(247, 244, 244, 0.4);
 }
 
 .window-content #page1 {
@@ -67,6 +68,7 @@ body {
     display: flex;
     flex-direction: column;
     width: 50%;
+    color: black;
 }
 
 .window-content .bar-code-selector .message-box-container {
@@ -113,6 +115,22 @@ body {
     margin: 0 auto;
     min-height: 300px;
     padding: 20px;
+}
+
+.window-content .info-container .info-box .product-info-div{
+    display: flex;
+    flex-direction: row;
+    width: 700px;
+    margin-bottom: 20px;
+}
+
+.window-content .info-container .info-box .product-info-div label{
+    width: 25%;
+}
+
+.window-content .info-container .info-box .product-info-div input{
+    color: black;
+    width: 75%;
 }
 
 footer {

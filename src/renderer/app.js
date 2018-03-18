@@ -74,31 +74,73 @@ function addFunctionalityOfBarCodeInput() {
     var barCodeInput = document.getElementById("bar-code");
     barCodeInput.focus();
     barCodeInput.addEventListener('keyup', function(event) {
-        console.log(event.keyCode);
-        // TODO Obtener el keyCode de la pistola de códigos
-        var value = barCodeInput.value;
-        var item = getInfo(value);
-        var status = item.status;
-        var messageBox = document.getElementById('message-box');
-        var messageBoxText = document.getElementById('message-box-text');
-        messageBox.className = "message-box " + status;
-        switch(status) {
-            case 'not-found':
-                messageBoxText.innerText = 'No encontrado';
-                break;
-            case 'about-to-expire':
-                messageBoxText.innerText = 'A punto de caducar';
-                break;
-            case 'expired':
-                messageBoxText.innerText = 'Caducado';
-                break;
-            case 'correct':
-                messageBoxText.innerText = 'Correcto';
-                break;
+        if (event.keyCode !== 17) {
+            getBarCodeSelected(barCodeInput, event);
         }
-        // TODO Aqui ejecutamos la función getInfo y limpiamos el input.
-        // Hay que asegurarse que siempre tenga el focus
     });
+}
+
+// TODO Intentar meter el debounce en el lector
+var debounceInputListener = debounce(function() {
+    // getBarCodeSelected(barCodeInput, event);
+}, 1000, false);
+
+// Debounce function extraída de google
+function debounce(func, wait, immediate) {
+    var timeout;
+    return function() {
+        var context = this, args = arguments;
+        var later = function() {
+            timeout = null;
+            if (!immediate) func.apply(context, args);
+        };
+        var callNow = immediate && !timeout;
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+        if (callNow) func.apply(context, args);
+    };
+};
+
+// Función que añade los eventos necesarios al input recolector de códigos de barras.
+function getBarCodeSelected(barCodeInput, event) {
+    console.log(event.keyCode);
+    // TODO Obtener el keyCode de la pistola de códigos
+    var value = barCodeInput.value;
+    var item = getInfo(value);
+    var status = item.status;
+    setProductInfo(item.item);
+    var messageBox = document.getElementById('message-box');
+    var messageBoxText = document.getElementById('message-box-text');
+    messageBox.className = "message-box " + status;
+    switch(status) {
+        case 'not-found':
+            messageBoxText.innerText = 'No encontrado';
+            break;
+        case 'about-to-expire':
+            messageBoxText.innerText = 'A punto de caducar';
+            break;
+        case 'expired':
+            messageBoxText.innerText = 'Caducado';
+            break;
+        case 'correct':
+            messageBoxText.innerText = 'Correcto';
+            break;
+    }
+    barCodeInput.value = '';
+    // Hay que asegurarse que siempre tenga el focus
+}
+
+function setProductInfo(item) {
+    let numeroLoteElement = document.getElementById('numero-de-lote');
+    let descripcionElement = document.getElementById('descripcion-articulo');
+    let nombreElement = document.getElementById('nombre-cliente');
+    let fechaElement = document.getElementById('fecha-albaran');
+    let fechaCaducidadElement = document.getElementById('fecha-caducidad');
+    numeroLoteElement.value = item ? item.id : '';
+    descripcionElement.value = item ? item.item_description : '';
+    nombreElement.value = item ? item.client_name : '';
+    fechaElement.value = item ? item.delivery_date : '';
+    fechaCaducidadElement.value = item ? item.expiration_date : '';
 }
 
 // Carga el excel en localStorage y devuelve la lista de productos caducados
