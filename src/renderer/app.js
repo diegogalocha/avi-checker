@@ -26,12 +26,13 @@ function initializeListeners() {
     });
 }
 
+// Función que chequea si el archivo seleccionado es válido para mostrar un error
+// o seguir adelante
 function checkFileAndGetExpired(file) {
+    var errorElement = document.getElementById('format-error');
     if (file.type) {
-        // TODO Comprobar si es un archivo excel
         let expired = loadXls(file.path);
-        var errorElement = document.getElementById('format-error');
-        if (expired.success) {
+s        if (expired.success) {
             errorElement.style.display = 'none';
             goToPage(true);
         } else {
@@ -39,10 +40,8 @@ function checkFileAndGetExpired(file) {
             // TODO intentar poner un archivo de ejemplo para descargar
         }
         // Expired me devuelve la lista de expirados
-        // TODO Llamar a la función de ir a página siguiente
     } else {
-        var errorElement = document.getElementById('format-error');
-        errorElement.style.display = 'initial';
+        errorElement.style.display = 'block';
     }
 }
 
@@ -149,27 +148,27 @@ function setProductInfo(item) {
 
 // Carga el excel en localStorage y devuelve la lista de productos caducados
 function loadXls (path) {
-  var file = XLSX.readFile(path);
-  var sheet = file.Sheets[file.SheetNames[0]];
+    var file = XLSX.readFile(path);
+    var sheet = file.Sheets[file.SheetNames[0]];
 
-  var items = XLSX.utils.sheet_to_json(sheet, {header: [
-    'code',
-    'name',
-    'client_code',
-    'client_name',
-    'item_code',
-    'item_description',
-    'id',
-    'delivery_number',
-    'units',
-    'sale_price',
-    'delivery_date',
-    'expiration_date'
-  ],
-  range: 1});
+    var items = XLSX.utils.sheet_to_json(sheet, {header: [
+        'code',
+        'name',
+        'client_code',
+        'client_name',
+        'item_code',
+        'item_description',
+        'id',
+        'delivery_number',
+        'units',
+        'sale_price',
+        'delivery_date',
+        'expiration_date'
+    ],
+    range: 1});
 
-  var header1 = items.shift();
-  var header2 = items.shift();
+    var header1 = items.shift();
+    var header2 = items.shift();
 
 	if (!isValid(header1, header2)) {
 		return {
@@ -177,11 +176,12 @@ function loadXls (path) {
 		};
 	}
 
-  var expired = getExpired(items);
 
-  localStorage.setItem('items', JSON.stringify(items));
+    var expired = getExpired(items);
 
-  return {
+    localStorage.setItem('items', JSON.stringify(items));
+
+    return {
 		success: true,
 		items: expired
 	};
@@ -189,72 +189,72 @@ function loadXls (path) {
 
 // Devuelve el estado de un producto dado su id
 function getInfo(id) {
-  var items = JSON.parse(localStorage.getItem('items'));
+    var items = JSON.parse(localStorage.getItem('items'));
 
-  let matchedItem = null;
-  let status = 'not-found';
+    let matchedItem = null;
+    let status = 'not-found';
 
-  for(var item of items) {
-    if (item.id == id) {
-      matchedItem = item;
-      var expirationDate = getExpirationDate(item);
+    for(var item of items) {
+        if (item.id == id) {
+            matchedItem = item;
+            var expirationDate = getExpirationDate(item);
 
-      if (isExpired(expirationDate)) {
-        status = 'expired';
-        break;
-      }
+            if (isExpired(expirationDate)) {
+                status = 'expired';
+                break;
+            }
 
-      if (isAboutToExpire(expirationDate)) {
-        status = 'about-to-expire';
-        break;
-      }
+            if (isAboutToExpire(expirationDate)) {
+                status = 'about-to-expire';
+                break;
+            }
 
-      status = 'correct';
-      break;
+            status = 'correct';
+            break;
+        }
     }
-  }
 
-  return {
+    return {
         'status': status,
         'item': matchedItem
-  };
+    };
 }
 
 // Devuelve la fecha de caducidad de un producto como objeto Date
 function getExpirationDate(item) {
-  var parts = item.expiration_date.split('/');
+    var parts = item.expiration_date.split('/');
 
-  return new Date('20' + parts[2], parts[0] - 1, parts[1]);
+    return new Date('20' + parts[2], parts[0] - 1, parts[1]);
 }
 
 // Devuelve si la fecha de caducidad de un producto indica que está caducado
 function isExpired(expirationDate) {
-  var now = new Date();
+    var now = new Date();
 
-  return expirationDate < now;
+    return expirationDate < now;
 }
 
 // Devuelve si la fecha de caducidad de un producto indica que está a punto de caducar
 function isAboutToExpire(expirationDate) {
-  var nextMonth = new Date();
-  nextMonth.setMonth(nextMonth.getMonth() + 3);
+    var nextMonth = new Date();
+    nextMonth.setMonth(nextMonth.getMonth() + 3);
 
-  return expirationDate < nextMonth;
+    return expirationDate < nextMonth;
 }
 
 // Devolver los productos caducados
 function getExpired (items) {
-  var expired = [];
+    var expired = [];
 
-  for(var item of items) {
-    var expirationDate = getExpirationDate(item);
+    for(var item of items) {
+        var expirationDate = getExpirationDate(item);
 
-    if (isExpired(expirationDate)) {
-      expired.push(item.item_description);
+        if (isExpired(expirationDate)) {
+            expired.push(item.item_description);
+        }
     }
-  }
 
-  return expired;
+    return expired;
 }
 
 // Devuelve si el contenido del Excel es válido según sus cabeceras
@@ -262,19 +262,19 @@ function isValid(header1, header2) {
 	var validHeader1 = (header1['client_name'] ==  "DEPOSITOS POR DELEGADOS");
 
 	var validHeader2 = (
-		(header2['client_code'] == 'Cód. Cliente') &&
-		(header2['client_name'] == 'Nombre Cliente') &&
-		(header2['code'] == 'Código') &&
-		(header2['delivery_date'] == 'Fecha Albarán') &&
-		(header2['delivery_number'] == 'Nº Albarán') &&
-		(header2['expiration_date'] == 'Fecha Caducidad') &&
-		(header2['id'] == 'Nº Lote') &&
-		(header2['item_code'] == 'Cód. Artículo') &&
-		(header2['item_description'] == 'Descripción Artículo') &&
-		(header2['name'] == 'Nombre') &&
-		(header2['sale_price'] == 'Precio Venta') &&
-		(header2['units'] == 'Unidades') &&
-		(header2['client_code'] == 'Cód. Cliente')
+		(header2['client_code'] === 'Cód. Cliente') &&
+		(header2['client_name'] === 'Nombre Cliente') &&
+		(header2['code'] === 'Código') &&
+		(header2['delivery_date'] === 'Fecha Albarán') &&
+		(header2['delivery_number'] === 'Nº Albarán') &&
+		(header2['expiration_date'] === 'Fecha Caducidad') &&
+		(header2['id'] === 'Nº Lote') &&
+		(header2['item_code'] === 'Cód. Artículo') &&
+		(header2['item_description'] === 'Descripción Artículo') &&
+		(header2['name'] === 'Nombre') &&
+		(header2['sale_price'] === 'Precio Venta') &&
+		(header2['units'] === 'Unidades') &&
+		(header2['client_code'] === 'Cód. Cliente')
 	);
 
 	return validHeader1 && validHeader2;
