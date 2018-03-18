@@ -15,8 +15,11 @@ body {
     margin: 0 auto;
     align-items: center;
     height: 100%;
-    padding-bottom: 20%;
     background-color: rgba(247, 244, 244, 0.3);
+}
+
+.window-content #page1 {
+    padding-bottom: 20%;
 }
 
 .window-content.hidden {
@@ -47,6 +50,51 @@ body {
 .window-content .button-container button {
 	width: 45%;
 	cursor: pointer;
+}
+
+.window-content .bar-code-selector {
+    height: 30%;
+    min-height: 300px;
+    display: flex;
+    flex-direction: row;
+    width: 80%;
+    justify-content: center;
+    align-items: center;
+}
+
+.window-content .bar-code-selector .bar-input {
+    display: flex;
+    flex-direction: column;
+    width: 50%;
+}
+
+.window-content .bar-code-selector .message-box-container {
+    display: flex;
+    justify-content: center;
+    width: 50%;
+}
+
+.window-content .bar-code-selector .message-box-container .message-box {
+    background-color: red;
+    width: 75%;
+    height: 50%;
+    text-align: center;
+    line-height: 3;
+    border-radius: 2%;
+ }
+
+.window-content .info-container {
+    height: 70%;
+    width: 100%;
+    min-height: 300px;
+}
+
+.window-content .info-container .info-box{
+    width: 80%;
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    margin: 0 auto;
+    min-height: 300px;
+    padding: 20px;
 }
 
 footer {
