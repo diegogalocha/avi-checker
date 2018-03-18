@@ -98,27 +98,36 @@ function loadXls (path) {
 
 // Devuelve el estado de un producto dado su id
 function getInfo(id) {
+	debugger
   var items = JSON.parse(localStorage.getItem('items'));
 
-  var status = 'not-found';
+	let matchedItem = null;
+  let status = 'not-found';
 
   for(var item of items) {
     if (item.id == id) {
+			matchedItem = item
       var expirationDate = getExpirationDate(item);
 
       if (isExpired(expirationDate)) {
-        return 'expired';
+        status = 'expired';
+				break;
       }
 
       if (isAboutToExpire(expirationDate)) {
-        return 'about_to_expire';
+        status = 'about_to_expire';
+				break;
       }
 
-      return 'correct';
+      status = 'correct';
+			break;
     }
   }
 
-  return status;
+  return {
+		'status': status,
+		'item': matchedItem
+	};
 }
 
 // Devuelve la fecha de caducidad de un producto como objeto Date
