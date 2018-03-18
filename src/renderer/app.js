@@ -125,7 +125,7 @@ function getExpired (items) {
     var expiration_date = getExpirationDate(item)
 
     if (isExpired(expiration_date)) {
-      expired.push(item.expiration_date)
+      expired.push(item.item_description)
     }
   }
 
