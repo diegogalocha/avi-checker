@@ -45,9 +45,10 @@ function goToPage(isNext) {
 	}
 };
 
+// Carga el excel en localStorage y devuelve la lista de productos caducados
 function loadXls (path) {
-  var file = XLSX.readFile(path)
-  var sheet = file.Sheets[file.SheetNames[0]]
+  var file = XLSX.readFile(path);
+  var sheet = file.Sheets[file.SheetNames[0]];
 
   var items = XLSX.utils.sheet_to_json(sheet, {header: [
     'code',
@@ -63,71 +64,77 @@ function loadXls (path) {
     'delivery_date',
     'expiration_date'
   ],
-  range: 1})
+  range: 1});
 
-  var header1 = items.shift()
-  var header2 = items.shift()
+  var header1 = items.shift();
+  var header2 = items.shift();
 
-  var expired = getExpired(items)
+  var expired = getExpired(items);
 
-  localStorage.setItem('items', JSON.stringify(items))
+  localStorage.setItem('items', JSON.stringify(items));
 
-  return expired
+  return expired;
 }
 
+// Devuelve el estado de un producto dado su id
 function getInfo(id) {
   var items = JSON.parse(localStorage.getItem('items'));
 
-  var status = 'not-found'
+  var status = 'not-found';
 
   for(var item of items) {
     if (item.id == id) {
-      var expiration_date = getExpirationDate(item)
+      var expirationDate = getExpirationDate(item);
 
-      if (isExpired(expiration_date)) {
-        return 'expired'
+      if (isExpired(expirationDate)) {
+        return 'expired';
       }
 
-      if (isAboutToExpire(expiration_date)) {
-        return 'about_to_expire'
+      if (isAboutToExpire(expirationDate)) {
+        return 'about_to_expire';
       }
 
-      return 'correct'
+      return 'correct';
     }
   }
 
-  return status
+  return status;
 }
 
+
+// Devuelve la fecha de caducidad de un producto como objeto Date
 function getExpirationDate(item) {
   var parts = item.expiration_date.split('/');
 
-  return new Date('20' + parts[2], parts[0] - 1, parts[1])
+  return new Date('20' + parts[2], parts[0] - 1, parts[1]);
 }
 
-function isExpired(expiration_date) {
-  var now = new Date()
+// Devuelve si la fecha de caducidad de un producto indica que está caducado
+function isExpired(expirationDate) {
+  var now = new Date();
 
-  return expiration_date < now
+  return expirationDate < now;
 }
 
-function isAboutToExpire(expiration_date) {
-  var nextMonth = new Date()
-  nextMonth.setMonth(nextMonth.getMonth() + 1)
+// Devuelve si la fecha de caducidad de un producto indica que está a punto de caducar
+function isAboutToExpire(expirationDate) {
+  var nextMonth = new Date();
+  nextMonth.setMonth(nextMonth.getMonth() + 1);
 
-  return expiration_date < nextMonth
+  return expirationDate < nextMonth;
 }
 
+// Devolver los productos caducados
 function getExpired (items) {
-  var expired = []
+  var expired = [];
 
   for(var item of items) {
-    var expiration_date = getExpirationDate(item)
+    var expirationDate = getExpirationDate(item);
 
-    if (isExpired(expiration_date)) {
-      expired.push(item.item_description)
+    if (isExpired(expirationDate)) {
+      expired.push(item.item_description);
     }
   }
 
-  return expired
+  return expired;
 }
