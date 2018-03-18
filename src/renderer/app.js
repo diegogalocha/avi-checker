@@ -28,18 +28,21 @@ function initializeListeners() {
 
 function checkFileAndGetExpired(file) {
     if (file.type) {
-        // Comprobar si es un archivo excel
+        // TODO Comprobar si es un archivo excel
         let expired = loadXls(file.path);
+        var errorElement = document.getElementById('format-error');
         if (expired.success) {
-            // TODO Mostrar el número de productos caducados
+            errorElement.style.display = 'none';
+            goToPage(true);
         } else {
-            // Mostrar error de que el formato de las celdas no es correcto
-            // intentar poner un archivo de ejemplo para descargar
+            errorElement.style.display = 'block';
+            // TODO intentar poner un archivo de ejemplo para descargar
         }
         // Expired me devuelve la lista de expirados
         // TODO Llamar a la función de ir a página siguiente
     } else {
-        // Mostrar error de archivo no válido
+        var errorElement = document.getElementById('format-error');
+        errorElement.style.display = 'initial';
     }
 }
 
@@ -130,6 +133,7 @@ function getBarCodeSelected(barCodeInput, event) {
     // Hay que asegurarse que siempre tenga el focus
 }
 
+// Función que añade la información del producto a mostrar
 function setProductInfo(item) {
     let numeroLoteElement = document.getElementById('numero-de-lote');
     let descripcionElement = document.getElementById('descripcion-articulo');
