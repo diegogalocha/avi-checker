@@ -80,11 +80,20 @@ function loadXls (path) {
   var header1 = items.shift();
   var header2 = items.shift();
 
+	if (!isValid(header1, header2)) {
+		return {
+			success: false
+		};
+	}
+
   var expired = getExpired(items);
 
   localStorage.setItem('items', JSON.stringify(items));
 
-  return expired;
+  return {
+		success: true,
+		items: expired
+	};
 }
 
 // Devuelve el estado de un producto dado su id
@@ -111,7 +120,6 @@ function getInfo(id) {
 
   return status;
 }
-
 
 // Devuelve la fecha de caducidad de un producto como objeto Date
 function getExpirationDate(item) {
@@ -148,4 +156,27 @@ function getExpired (items) {
   }
 
   return expired;
+}
+
+// Devuelve si el contenido del Excel es válido según sus cabeceras
+function isValid(header1, header2) {
+	var validHeader1 = (header1['client_name'] ==  "DEPOSITOS POR DELEGADOS");
+
+	var validHeader2 = (
+		(header2['client_code'] == 'Cód. Cliente') &&
+		(header2['client_name'] == 'Nombre Cliente') &&
+		(header2['code'] == 'Código') &&
+		(header2['delivery_date'] == 'Fecha Albarán') &&
+		(header2['delivery_number'] == 'Nº Albarán') &&
+		(header2['expiration_date'] == 'Fecha Caducidad') &&
+		(header2['id'] == 'Nº Lote') &&
+		(header2['item_code'] == 'Cód. Artículo') &&
+		(header2['item_description'] == 'Descripción Artículo') &&
+		(header2['name'] == 'Nombre') &&
+		(header2['sale_price'] == 'Precio Venta') &&
+		(header2['units'] == 'Unidades') &&
+		(header2['client_code'] == 'Cód. Cliente')
+	);
+
+	return validHeader1 && validHeader2;
 }
