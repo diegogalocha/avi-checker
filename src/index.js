@@ -16,7 +16,7 @@ app.on('before-quit', () => {
 // Ejecutando órdenes cuando la aplicación está lista
 app.on('ready', () => {
   let win = new BrowserWindow({
-    title: 'Hola Diego',
+    title: 'AVI Checker',
     center: true,
     show: false
   })

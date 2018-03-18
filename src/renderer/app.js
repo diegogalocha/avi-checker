@@ -1,43 +1,54 @@
-var XLSX = require('xlsx')
+import XLSX from 'xlsx'
 
 window.addEventListener('load', () => {
-	localStorage.setItem('page', 1)
-
-	let previousButton = document.getElementById('previous')
-	let nextButton = document.getElementById('next')
-	let xlfInput = document.getElementById('xlf')
-
-	previousButton.addEventListener('click', function(){
-	    goToPage(false);
-	});
-
-	nextButton.addEventListener('click', function(){
-	    goToPage(true);
-	});
-
-	xlfInput.addEventListener('change', function(event) {
-        var file = xlfInput.files[0];
-        loadXls(file.path);
-	});
+    // Inicializamos la página para llevar el control de dónde está el usuario
+	localStorage.setItem('page', 1);
+    // Añadimos los listener a los botones de Atrás y Siguiente, y al input file
+	initializeListeners();
 })
 
-function goToPage(isNext) {
-	var pageNumber = parseInt(localStorage.getItem('page'), 10)
-	var movement = isNext ? pageNumber + 1 : pageNumber - 1
+// Función que inicializa los listeners necesarios
+function initializeListeners() {
+    let previousButton = document.getElementById('previous');
+    let nextButton = document.getElementById('next');
+    let xlfInput = document.getElementById('xlf');
 
-	var idToHide = 'page' + pageNumber
-	var idToShow = 'page' + movement
-	var pageToHide = document.getElementById(idToHide)
-	var pageToShow = document.getElementById(idToShow)
+    previousButton.addEventListener('click', function(){
+        goToPage(false);
+    });
+
+    nextButton.addEventListener('click', function(){
+        goToPage(true);
+    });
+
+    xlfInput.addEventListener('change', function(event) {
+        let file = xlfInput.files[0];
+        // TODO Validamos el archivo antes de ejecutarlo
+        let expired = loadXls(file.path);
+        // Expired me devuelve la lista de expirados
+        // TODO Llamar a la función de ir a página siguiente
+    });
+}
+
+// Función que lanza al usuario a la página indicada. "isNext" nos sirve
+// para indicar si el usuario va hacia delante o hacia atrás
+function goToPage(isNext) {
+	var pageNumber = parseInt(localStorage.getItem('page'), 10);
+	var movement = isNext ? pageNumber + 1 : pageNumber - 1;
+
+	var idToHide = 'page' + pageNumber;
+	var idToShow = 'page' + movement;
+	var pageToHide = document.getElementById(idToHide);
+	var pageToShow = document.getElementById(idToShow);
 
 	if (pageToHide) {
-		pageToHide.classList.add("hidden")
+		pageToHide.classList.add("hidden");
 	}
 	if (pageToShow) {
-		pageToShow.classList.remove("hidden")
+		pageToShow.classList.remove("hidden");
 	}
 
-	localStorage.setItem('page', movement)
+	localStorage.setItem('page', movement);
 
 	// Si el paso es a la página 3, ponemos el focus al input del selector de barCode
 	if (movement === 3) {
