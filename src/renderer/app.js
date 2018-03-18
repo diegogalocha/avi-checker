@@ -139,6 +139,8 @@ function getBarCodeSelected(barCodeInput, event) {
     var value = barCodeInput.value;
     var item = getInfo(value);
     var status = item.status;
+    let audio;
+
     setProductInfo(item.item);
     var messageBox = document.getElementById('message-box');
     var messageBoxText = document.getElementById('message-box-text');
@@ -149,13 +151,20 @@ function getBarCodeSelected(barCodeInput, event) {
             break;
         case 'about-to-expire':
             messageBoxText.innerText = 'A punto de caducar';
+            audio = new Audio('../sounds/warning.mp3');
             break;
         case 'expired':
             messageBoxText.innerText = 'Caducado';
+            audio = new Audio('../sounds/error.mp3');
             break;
         case 'correct':
             messageBoxText.innerText = 'Correcto';
+            audio = new Audio('../sounds/correct.mp3');
             break;
+    }
+
+    if (audio) {
+        audio.play();
     }
     barCodeInput.value = '';
     // Hay que asegurarse que siempre tenga el focus
@@ -227,7 +236,7 @@ function getInfo(id) {
     let status = 'not-found';
 
     for(var item of items) {
-        if (item.id == id) {
+        if (item.id === id) {
             matchedItem = item;
             var expirationDate = getExpirationDate(item);
 
