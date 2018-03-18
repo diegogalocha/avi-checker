@@ -11,7 +11,8 @@
     <header class="toolbar toolbar-header">
         <h1 class="title">AVI Checker</h1>
     </header>
-    <div class="window-content avi-content">
+
+    <div id="page1" class="window-content avi-content">
         <h1>Bienvenido a Avi Checker</h1>
         <p>Seleccione un archivo con el formato adecuado para iniciar el programa</p>
         <div class="select-input">    
@@ -19,15 +20,22 @@
         </div>
         <div class="button-container">
             <button class="btn btn-default">Reset</button>
-            <button class="btn btn-primary">Confirmar</button>
+            <button class="btn btn-primary" onclick="">Confirmar</button>
         </div>
     </div>
+    <div id="page2" class="window-content avi-content hidden">
+        <h1>Página 2</h1>
+    </div>
+    <div id="page3" class="window-content avi-content hidden">
+        <h1>Página 3</h1>
+    </div>
+
     <footer class="toolbar toolbar-footer">
         <div class="toolbar-actions">
-            <button class="btn btn-default">
+            <button id="previous" class="btn btn-default">
                 Anterior
             </button>
-            <button class="btn btn-primary pull-right">
+            <button id="next" class="btn btn-primary pull-right">
                 Siguiente
             </button>
         </div>

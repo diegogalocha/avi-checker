@@ -19,6 +19,10 @@ body {
     background-color: rgba(247, 244, 244, 0.3);
 }
 
+.window-content.hidden {
+    display: none;
+}
+
 .window-content h1,h2,h3,h4,h5,h6 {
 	margin: 0
 }
@@ -43,4 +47,15 @@ body {
 .window-content .button-container button {
 	width: 45%;
 	cursor: pointer;
+}
+
+footer {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    padding: 0 25%;
+}
+
+footer button {
+    cursor: pointer;
 }
