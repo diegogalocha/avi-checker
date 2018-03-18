@@ -32,7 +32,7 @@ function checkFileAndGetExpired(file) {
     var errorElement = document.getElementById('format-error');
     if (file.type) {
         let expired = loadXls(file.path);
-s        if (expired.success) {
+        if (expired.success) {
             errorElement.style.display = 'none';
             goToPage(true);
         } else {
@@ -223,8 +223,10 @@ function getInfo(id) {
 // Devuelve la fecha de caducidad de un producto como objeto Date
 function getExpirationDate(item) {
     var parts = item.expiration_date.split('/');
+    var year = parts[2];
+    year = year.length === 4 ? year : '20' + year;
 
-    return new Date('20' + parts[2], parts[0] - 1, parts[1]);
+    return new Date(year, parts[0] - 1, parts[1]);
 }
 
 // Devuelve si la fecha de caducidad de un producto indica que está caducado
