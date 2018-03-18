@@ -60,6 +60,7 @@ body {
     width: 80%;
     justify-content: center;
     align-items: center;
+    padding-top: 100px;
 }
 
 .window-content .bar-code-selector .bar-input {
@@ -75,13 +76,30 @@ body {
 }
 
 .window-content .bar-code-selector .message-box-container .message-box {
-    background-color: red;
+    background-color: black;
     width: 75%;
     height: 50%;
     text-align: center;
     line-height: 3;
     border-radius: 2%;
  }
+
+ .window-content .bar-code-selector .message-box-container .message-box.about-to-expire {
+    background-image: linear-gradient(to bottom,#fece72 0,#fcaa0e 100%);
+ }
+
+ .window-content .bar-code-selector .message-box-container .message-box.expired {
+    background-image: linear-gradient(to bottom,#fc605b 0,#fb1710 100%);
+ }
+
+ .window-content .bar-code-selector .message-box-container .message-box.correct {
+    background-image: linear-gradient(to bottom,#34c84a 0,#248b34 100%);
+ }
+
+ .window-content .bar-code-selector .message-box-container .message-box.not-found {
+    background-color: #ddd;
+ }
+
 
 .window-content .info-container {
     height: 70%;
@@ -101,7 +119,7 @@ footer {
     position: fixed;
     bottom: 0;
     width: 100%;
-    padding: 0 25%;
+    padding: 0 20%;
 }
 
 footer.toolbar {

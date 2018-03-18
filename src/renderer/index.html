@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <title>Hola Diego</title>
+  <title>AVI Checker</title>
   <link rel="stylesheet" type="text/css" href="../assets/css/photon.min.css">
   <link rel="stylesheet" type="text/css" href="../assets/css/main.css">
 </head>
@@ -16,7 +16,8 @@
         </div>
     </div>
     <div id="page2" class="window-content avi-content hidden">
-        <h1>Excel cargado correctamente</h1>
+        <!-- Cargar en el javascript esta parte con el nombre del archivo -->
+        <h1 id="fileName">Excel cargado correctamente</h1>
         <p>A continuación puede ver una lista de los archivos caducados.</p>
     </div>
     <div id="page3" class="window-content avi-content hidden">
@@ -26,8 +27,8 @@
                 <input id="bar-code" name="bar-code" type="text">
             </div>
             <div class="message-box-container">
-                <div class="message-box">
-                    <h3>CADUCADO</h3>
+                <div id="message-box" class="message-box">
+                    <h3 id="message-box-text">Seleccione un elemento</h3>
                 </div>
             </div>
         </div>

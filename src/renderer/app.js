@@ -21,13 +21,26 @@ function initializeListeners() {
         goToPage(true);
     });
 
-    xlfInput.addEventListener('change', function(event) {
-        let file = xlfInput.files[0];
-        // TODO Validamos el archivo antes de ejecutarlo
+    xlfInput.addEventListener('change', function() {
+        checkFileAndGetExpired(xlfInput.files[0]);
+    });
+}
+
+function checkFileAndGetExpired(file) {
+    if (file.type) {
+        // Comprobar si es un archivo excel
         let expired = loadXls(file.path);
+        if (expired.success) {
+            // TODO Mostrar el número de productos caducados
+        } else {
+            // Mostrar error de que el formato de las celdas no es correcto
+            // intentar poner un archivo de ejemplo para descargar
+        }
         // Expired me devuelve la lista de expirados
         // TODO Llamar a la función de ir a página siguiente
-    });
+    } else {
+        // Mostrar error de archivo no válido
+    }
 }
 
 // Función que lanza al usuario a la página indicada. "isNext" nos sirve
@@ -50,11 +63,43 @@ function goToPage(isNext) {
 
 	localStorage.setItem('page', movement);
 
-	// Si el paso es a la página 3, ponemos el focus al input del selector de barCode
-	if (movement === 3) {
-		document.getElementById("bar-code").focus();
+	// Si el paso es a la página 3, tenemos que dar la funcionalidad al barCodeInput
+    if (movement === 3) {
+        addFunctionalityOfBarCodeInput();
 	}
-};
+}
+
+// Añadimos la funcionalidad necesaria al input lector de bar code
+function addFunctionalityOfBarCodeInput() {
+    var barCodeInput = document.getElementById("bar-code");
+    barCodeInput.focus();
+    barCodeInput.addEventListener('keyup', function(event) {
+        console.log(event.keyCode);
+        // TODO Obtener el keyCode de la pistola de códigos
+        var value = barCodeInput.value;
+        var item = getInfo(value);
+        var status = item.status;
+        var messageBox = document.getElementById('message-box');
+        var messageBoxText = document.getElementById('message-box-text');
+        messageBox.className = "message-box " + status;
+        switch(status) {
+            case 'not-found':
+                messageBoxText.innerText = 'No encontrado';
+                break;
+            case 'about-to-expire':
+                messageBoxText.innerText = 'A punto de caducar';
+                break;
+            case 'expired':
+                messageBoxText.innerText = 'Caducado';
+                break;
+            case 'correct':
+                messageBoxText.innerText = 'Correcto';
+                break;
+        }
+        // TODO Aqui ejecutamos la función getInfo y limpiamos el input.
+        // Hay que asegurarse que siempre tenga el focus
+    });
+}
 
 // Carga el excel en localStorage y devuelve la lista de productos caducados
 function loadXls (path) {
@@ -98,36 +143,35 @@ function loadXls (path) {
 
 // Devuelve el estado de un producto dado su id
 function getInfo(id) {
-	debugger
   var items = JSON.parse(localStorage.getItem('items'));
 
-	let matchedItem = null;
+  let matchedItem = null;
   let status = 'not-found';
 
   for(var item of items) {
     if (item.id == id) {
-			matchedItem = item
+      matchedItem = item;
       var expirationDate = getExpirationDate(item);
 
       if (isExpired(expirationDate)) {
         status = 'expired';
-				break;
+        break;
       }
 
       if (isAboutToExpire(expirationDate)) {
-        status = 'about_to_expire';
-				break;
+        status = 'about-to-expire';
+        break;
       }
 
       status = 'correct';
-			break;
+      break;
     }
   }
 
   return {
-		'status': status,
-		'item': matchedItem
-	};
+        'status': status,
+        'item': matchedItem
+  };
 }
 
 // Devuelve la fecha de caducidad de un producto como objeto Date
@@ -147,7 +191,7 @@ function isExpired(expirationDate) {
 // Devuelve si la fecha de caducidad de un producto indica que está a punto de caducar
 function isAboutToExpire(expirationDate) {
   var nextMonth = new Date();
-  nextMonth.setMonth(nextMonth.getMonth() + 1);
+  nextMonth.setMonth(nextMonth.getMonth() + 3);
 
   return expirationDate < nextMonth;
 }
