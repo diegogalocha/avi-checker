@@ -17,14 +17,8 @@ window.addEventListener('load', () => {
 
 	xlfInput.addEventListener('change', function(event) {
         var file = xlfInput.files[0];
+        loadXls(file.path);
 	});
-
-	/*var path = __dirname + '/excel.xlsx'
-  var id = '161020EV904AA15'
-  let status;
-
-  loadXls(path)
-  status = getInfo(id)*/
 })
 
 function goToPage(isNext) {
