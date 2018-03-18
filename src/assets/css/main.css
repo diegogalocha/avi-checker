@@ -51,6 +51,24 @@ body {
     display: none;
 }
 
+.window-content .numero-productos {
+    background-color: #34c84a;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.window-content .numero-caducados {
+    background-color: red;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.window-content .numero-apunto-caducar {
+    background-color: #ffcc00;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
 .window-content .button-container {
 	display: flex;
     flex-direction: row;

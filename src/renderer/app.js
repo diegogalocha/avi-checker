@@ -5,6 +5,7 @@ window.addEventListener('load', () => {
 	localStorage.setItem('page', 1);
     // Añadimos los listener a los botones de Atrás y Siguiente, y al input file
 	initializeListeners();
+    checkIfShowPreviousOrNextButton(1);
 })
 
 // Función que inicializa los listeners necesarios
@@ -31,10 +32,11 @@ function initializeListeners() {
 function checkFileAndGetExpired(file) {
     var errorElement = document.getElementById('format-error');
     if (file.type) {
-        let expired = loadXls(file.path);
-        if (expired.success) {
+        let response = loadXls(file.path);
+        if (response.success) {
             errorElement.style.display = 'none';
             goToPage(true);
+            setResumeValues(response.items, response.expiredItems, response.aboutToExpiredItems);
         } else {
             errorElement.style.display = 'block';
             // TODO intentar poner un archivo de ejemplo para descargar
@@ -43,6 +45,16 @@ function checkFileAndGetExpired(file) {
     } else {
         errorElement.style.display = 'block';
     }
+}
+
+// Función que inyecta los valores para el resumen de la segunda página
+function setResumeValues(items, expiredItems, aboutExpiredItems) {
+    let numberOfProducts = document.getElementById('numero-productos');
+    let numberOfExpired = document.getElementById('numero-caducados');
+    let numberOfAboutToExpired = document.getElementById('numero-apunto-caducar');
+    numberOfProducts.innerText = 'Se han cargado ' + items.length + ' productos del archivo.';
+    numberOfExpired.innerText = 'Tiene ' + expiredItems.length + ' productos caducados.';
+    numberOfAboutToExpired.innerText = 'Tiene ' + aboutExpiredItems.length + ' productos a punto de caducar.';
 }
 
 // Función que lanza al usuario a la página indicada. "isNext" nos sirve
@@ -69,6 +81,23 @@ function goToPage(isNext) {
     if (movement === 3) {
         addFunctionalityOfBarCodeInput();
 	}
+
+    checkIfShowPreviousOrNextButton(movement);
+}
+
+// Función que decide si mostrar o no los botones de atrás o siguiente
+function checkIfShowPreviousOrNextButton(page) {
+    let previousButton = document.getElementById('previous');
+    let nextButton = document.getElementById('next');
+    if (page === 1) {
+        previousButton.style.display = 'none';
+        nextButton.style.display = 'none';
+    } else if (page === 2 || page === 3) {
+        previousButton.style.display = 'initial';
+        nextButton.style.display = 'initial';
+    } else if (page === 4) {
+        nextButton.style.display = 'none';
+    }
 }
 
 // Añadimos la funcionalidad necesaria al input lector de bar code
@@ -178,12 +207,15 @@ function loadXls (path) {
 
 
     var expired = getExpired(items);
+    var aboutExpired = getAboutToExpired(items);
 
     localStorage.setItem('items', JSON.stringify(items));
 
     return {
 		success: true,
-		items: expired
+        items: items,
+		expiredItems: expired,
+        aboutToExpiredItems: aboutExpired
 	};
 }
 
@@ -257,6 +289,21 @@ function getExpired (items) {
     }
 
     return expired;
+}
+
+// Devolver los productos a punto de caducar
+function getAboutToExpired (items) {
+    var aboutToExpired = [];
+
+    for(var item of items) {
+        var expirationDate = getExpirationDate(item);
+
+        if (isAboutToExpire(expirationDate)) {
+            aboutToExpired.push(item.item_description);
+        }
+    }
+
+    return aboutToExpired;
 }
 
 // Devuelve si el contenido del Excel es válido según sus cabeceras
