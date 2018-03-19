@@ -64,6 +64,10 @@ label {
     display: none;
 }
 
+.window-content .info-box {
+    box-shadow: 1px 1px 20px -6px rgba(0, 0, 0, 0.75);
+}
+
 .window-content .numero-productos {
     background-color: #34c84a;
     padding: 20px;
@@ -121,17 +125,18 @@ label {
 
 .window-content .bar-code-selector .message-box-container {
     display: flex;
-    justify-content: center;
+    justify-content: flex-end;
     width: 50%;
 }
 
 .window-content .bar-code-selector .message-box-container .message-box {
     background-color: #3c8cbb;
-    width: 75%;
+    width: 85%;
     height: 50%;
     text-align: center;
     line-height: 3;
     border-radius: 2%;
+    box-shadow: 1px 1px 20px -6px rgba(0, 0, 0, 0.75);
  }
 
  .window-content .bar-code-selector .message-box-container .message-box.about-to-expire {
