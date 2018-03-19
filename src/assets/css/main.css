@@ -15,7 +15,7 @@ label {
 }
 
 .window-content {
-	position: relative;
+    position: relative;
     overflow-y: auto;
     display: flex;
     flex: 1;
@@ -38,7 +38,7 @@ label {
 }
 
 .window-content h1,h2,h3,h4,h5,h6 {
-	margin: 0
+    margin: 0
 }
 
 .window-content p {
@@ -46,12 +46,23 @@ label {
 }
 
 .window-content .select-input {
-	width: 400px;
-	margin: 15px 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 400px;
+    margin: 15px 0;
 }
 
-.window-content .select-input input{
-    cursor: pointer;
+.window-content .select-input .xls-input-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.window-content .select-input .xls-input-container img{
+    height: 35px;
+    margin-right: 10px;
 }
 
 .window-content .select-input .error-message {
@@ -87,15 +98,15 @@ label {
 }
 
 .window-content .button-container {
-	display: flex;
+    display: flex;
     flex-direction: row;
     justify-content: space-between;
     width: 400px;
 }
 
 .window-content .button-container button {
-	width: 45%;
-	cursor: pointer;
+    width: 45%;
+    cursor: pointer;
 }
 
 .window-content .bar-code-title {

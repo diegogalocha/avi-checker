@@ -11,8 +11,11 @@
     <div id="page1" class="window-content avi-content">
         <h1>Bienvenido a Avi Checker</h1>
         <p>Seleccione un archivo con el formato adecuado para iniciar el programa</p>
-        <div class="select-input">    
-            <input type="file" name="xlfile" id="xlf" accept=".xlsx, .xls">
+        <div class="select-input">
+            <div class="xls-input-container">
+                <img src="../assets/images/excel-icon.png" title="Excel" alt="Excel">
+                <input type="file" name="xlfile" id="xlf" accept=".xlsx, .xls">
+            </div>
             <h4 id="format-error" class="error-message">El archivo no tiene el formato correcto</h4>
         </div>
     </div>
