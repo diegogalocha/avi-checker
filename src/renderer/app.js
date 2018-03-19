@@ -126,11 +126,15 @@ function checkIfShowPreviousOrNextButton (page) {
 function addFunctionalityOfBarCodeInput () {
     var barCodeInput = document.getElementById('bar-code');
     barCodeInput.focus();
-    barCodeInput.addEventListener('keyup', function (event) {
-        if (event.keyCode !== 17) {
-            getBarCodeSelected(barCodeInput, event);
-        }
-    });
+    var isListenerAdded = parseInt(localStorage.getItem('barCodeInputListenerAdded'), 10);
+    if (!isListenerAdded) {
+        barCodeInput.addEventListener('keyup', function (event) {
+            if (event.keyCode !== 17) {
+                getBarCodeSelected(barCodeInput, event);
+            }
+        });
+        localStorage.setItem('barCodeInputListenerAdded', 1);
+    }
 }
 
 // TODO Intentar meter el debounce en el lector
