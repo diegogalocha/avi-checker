@@ -58,31 +58,35 @@ function setResumeValues(items, expiredItems, aboutExpiredItems) {
 }
 
 // Función que lanza al usuario a la página indicada. "isNext" nos sirve
-// para indicar si el usuario va hacia delante o hacia atrás
+// para indicar si el usuario va hacia delante o hacia atrás. Si el movimiento de página
+// es a la 5, queremos exportar el archivo y olvidar el ir a la siguiente página
 function goToPage(isNext) {
-	var pageNumber = parseInt(localStorage.getItem('page'), 10);
-	var movement = isNext ? pageNumber + 1 : pageNumber - 1;
+    var pageNumber = parseInt(localStorage.getItem('page'), 10);
+    var movement = isNext ? pageNumber + 1 : pageNumber - 1;
+    if (movement === 5) {
+        // TODO Call function export data
+    } else {
+    	var idToHide = 'page' + pageNumber;
+    	var idToShow = 'page' + movement;
+    	var pageToHide = document.getElementById(idToHide);
+    	var pageToShow = document.getElementById(idToShow);
 
-	var idToHide = 'page' + pageNumber;
-	var idToShow = 'page' + movement;
-	var pageToHide = document.getElementById(idToHide);
-	var pageToShow = document.getElementById(idToShow);
+    	if (pageToHide) {
+    		pageToHide.classList.add("hidden");
+    	}
+    	if (pageToShow) {
+    		pageToShow.classList.remove("hidden");
+    	}
 
-	if (pageToHide) {
-		pageToHide.classList.add("hidden");
-	}
-	if (pageToShow) {
-		pageToShow.classList.remove("hidden");
-	}
+    	localStorage.setItem('page', movement);
 
-	localStorage.setItem('page', movement);
+    	// Si el paso es a la página 3, tenemos que dar la funcionalidad al barCodeInput
+        if (movement === 3) {
+            addFunctionalityOfBarCodeInput();
+    	}
 
-	// Si el paso es a la página 3, tenemos que dar la funcionalidad al barCodeInput
-    if (movement === 3) {
-        addFunctionalityOfBarCodeInput();
-	}
-
-    checkIfShowPreviousOrNextButton(movement);
+        checkIfShowPreviousOrNextButton(movement);
+    }
 }
 
 // Función que decide si mostrar o no los botones de atrás o siguiente
@@ -95,8 +99,14 @@ function checkIfShowPreviousOrNextButton(page) {
     } else if (page === 2 || page === 3) {
         previousButton.style.display = 'initial';
         nextButton.style.display = 'initial';
+    }
+
+    if (page === 2) {
+        nextButton.innerText = 'Siguiente';
+    } else if (page === 3) {
+        nextButton.innerText = 'Finalizar';
     } else if (page === 4) {
-        nextButton.style.display = 'none';
+        nextButton.innerText = 'Exportar datos';
     }
 }
 

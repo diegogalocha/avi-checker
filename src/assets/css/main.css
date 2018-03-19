@@ -2,7 +2,7 @@ body {
     background-color: #b5007c;
     background-image: url(../images/advanced-vision-iberia.png);
     background-repeat: no-repeat;
-    font-size: 15px;
+    font-size: 16px;
     color: white;
     background-size: 18%;
     background-position-x: 17px;
@@ -168,7 +168,7 @@ label {
 .window-content .info-container .info-box .product-info-div{
     display: flex;
     flex-direction: row;
-    width: 700px;
+    width: 95%;
     margin-bottom: 20px;
 }
 
@@ -179,6 +179,23 @@ label {
 .window-content .info-container .info-box .product-info-div input{
     color: black;
     width: 75%;
+}
+
+.window-content.last-page {
+    align-items: left;
+}
+
+.window-content.last-page h1 {
+    width: 100%;
+    text-align: center;
+}
+
+.window-content.last-page p {
+    text-align: left;
+}
+
+.window-content.last-page h1, p {
+    padding: 0 100px;
 }
 
 footer {
