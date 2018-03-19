@@ -106,6 +106,15 @@ label {
     text-align: center;
 }
 
+.window-content .bar-code-title h1 {
+    display: flex;
+    justify-content: center;
+}
+
+.window-content .bar-code-title h1 img {
+    margin-left: 10px;
+}
+
 .window-content .bar-code-selector {
     height: 25%;
     min-height: 250px;
