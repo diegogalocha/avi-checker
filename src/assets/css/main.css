@@ -10,7 +10,8 @@ body {
 }
 
 label {
-    font-size: 15px;
+    font-size: 16px;
+    color: white;
 }
 
 .window-content {
@@ -25,7 +26,7 @@ label {
     margin: 0 auto;
     align-items: center;
     height: 100%;
-    background-color: rgba(247, 244, 244, 0.4);
+    background-color: rgba(255, 255, 255, 0.4);
 }
 
 .window-content #page1 {
@@ -47,7 +48,10 @@ label {
 .window-content .select-input {
 	width: 400px;
 	margin: 15px 0;
-	cursor: pointer;
+}
+
+.window-content .select-input input{
+    cursor: pointer;
 }
 
 .window-content .select-input .error-message {
@@ -90,15 +94,22 @@ label {
 	cursor: pointer;
 }
 
+.window-content .bar-code-title {
+    height: 10%;
+    min-height: 100px;
+    width: 80%;
+    padding-top: 75px;
+    text-align: center;
+}
+
 .window-content .bar-code-selector {
-    height: 30%;
-    min-height: 300px;
+    height: 25%;
+    min-height: 250px;
     display: flex;
     flex-direction: row;
     width: 80%;
     justify-content: center;
     align-items: center;
-    padding-top: 100px;
 }
 
 .window-content .bar-code-selector .bar-input {
@@ -115,7 +126,7 @@ label {
 }
 
 .window-content .bar-code-selector .message-box-container .message-box {
-    background-color: black;
+    background-color: #3c8cbb;
     width: 75%;
     height: 50%;
     text-align: center;
@@ -141,7 +152,7 @@ label {
 
 
 .window-content .info-container {
-    height: 70%;
+    height: 65%;
     width: 100%;
     min-height: 300px;
 }
