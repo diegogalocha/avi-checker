@@ -14,6 +14,12 @@ label {
     color: white;
 }
 
+input {
+    border-style: inset;
+    padding-left: 5px;
+    border-color: #e2dfdf;
+}
+
 .window-content {
     position: relative;
     overflow-y: auto;
@@ -169,6 +175,11 @@ label {
     flex-direction: column;
     width: 50%;
     color: black;
+}
+
+.window-content .bar-code-selector .bar-input input:focus{
+    outline-color: #b5007c;
+    border: 2px solid #b5007c;
 }
 
 .window-content .bar-code-selector .message-box-container {
