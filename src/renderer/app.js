@@ -226,7 +226,7 @@ function loadXls (path) {
 
 
     var expired = getExpired(items);
-    var aboutExpired = getAboutToExpired(items);
+    var aboutExpired = getAboutToExpire(items);
 
     localStorage.setItem('items', JSON.stringify(items));
 
@@ -289,10 +289,12 @@ function isExpired(expirationDate) {
 
 // Devuelve si la fecha de caducidad de un producto indica que está a punto de caducar
 function isAboutToExpire(expirationDate) {
+		var now = new Date();
+
     var nextMonth = new Date();
     nextMonth.setMonth(nextMonth.getMonth() + 3);
 
-    return expirationDate < nextMonth;
+    return (expirationDate > now) && (expirationDate < nextMonth);
 }
 
 // Devolver los productos caducados
@@ -311,7 +313,7 @@ function getExpired (items) {
 }
 
 // Devolver los productos a punto de caducar
-function getAboutToExpired (items) {
+function getAboutToExpire (items) {
     var aboutToExpired = [];
 
     for(var item of items) {
