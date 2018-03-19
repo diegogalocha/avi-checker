@@ -32,6 +32,7 @@ function initializeListeners () {
 function checkFileAndGetExpired (file) {
     var errorElement = document.getElementById('format-error');
     if (file.type) {
+        setFileName(file.name);
         let response = loadXls(file.path);
         if (response.success) {
             errorElement.style.display = 'none';
@@ -39,12 +40,19 @@ function checkFileAndGetExpired (file) {
             setResumeValues(response.items, response.expiredItems, response.aboutToExpiredItems);
         } else {
             errorElement.style.display = 'block';
+            document.getElementById('span-input-file').innerText = 'Seleccione un archivo válido';
             // TODO intentar poner un archivo de ejemplo para descargar
         }
         // Expired me devuelve la lista de expirados
     } else {
         errorElement.style.display = 'block';
     }
+}
+
+// Función que settea el nombre del archivo en la página inicial
+function setFileName(name) {
+    let spanName = document.getElementById('file-name-span');
+    spanName.innerText = name;
 }
 
 // Función que inyecta los valores para el resumen de la segunda página
@@ -85,6 +93,8 @@ function goToPage (isNext) {
             addFunctionalityOfBarCodeInput();
         } else if (movement === 1) {
             document.getElementById('xlf').value = '';
+            document.getElementById('file-name-span').innerText = '';
+            document.getElementById('span-input-file').innerText = 'Seleccione un archivo';
         }
 
         checkIfShowPreviousOrNextButton(movement);

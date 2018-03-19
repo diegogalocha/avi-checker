@@ -13,8 +13,12 @@
         <p>Seleccione un archivo con el formato adecuado para iniciar el programa</p>
         <div class="select-input">
             <div class="xls-input-container">
-                <img src="../assets/images/excel-icon.png" title="Excel" alt="Excel">
+                <label for="xlf" class="custom-file-upload">
+                    <img src="../assets/images/excel-icon.png" title="Excel" alt="Excel">
+                    <span id="span-input-file">Seleccione un archivo</span>
+                </label>
                 <input type="file" name="xlfile" id="xlf" accept=".xlsx, .xls">
+                <span id="file-name-span" class="file-name-span"></span>
             </div>
             <h4 id="format-error" class="error-message">El archivo no tiene el formato correcto</h4>
         </div>

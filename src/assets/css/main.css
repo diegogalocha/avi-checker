@@ -50,7 +50,7 @@ label {
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    width: 400px;
+    min-width: 400px;
     margin: 15px 0;
 }
 
@@ -60,39 +60,67 @@ label {
     align-items: center;
 }
 
-.window-content .select-input .xls-input-container img{
+.window-content .select-input .xls-input-container .custom-file-upload {
+    display: flex;
+    align-items: center;
+    border: 1px solid #b5007c;
+    padding: 6px 12px;
+    cursor: pointer;
+    box-shadow: 1px 1px 10px -3px rgba(0, 0, 0, 0.75);
+}
+
+.window-content .select-input .xls-input-container .custom-file-upload:hover {
+    background-color: #b5007c;
+}
+
+.window-content .select-input .xls-input-container .custom-file-upload img {
     height: 35px;
     margin-right: 10px;
+}
+
+.window-content .select-input .xls-input-container .custom-file-upload span {
+    cursor: pointer;
+}
+
+.window-content .select-input .xls-input-container input {
+    display: none;
+}
+
+.window-content .select-input .xls-input-container .file-name-span {
+    margin-left: 10px;
 }
 
 .window-content .select-input .error-message {
     color: red;
     background-color: white;
-    padding: 10px;
+    padding: 5px 20px;
+    font-size: 17px;
     margin-top: 15px;
     border-radius: 2%;
     text-align: center;
     display: none;
+    box-shadow: 1px 1px 10px -3px rgba(0, 0, 0, 0.75);
 }
 
 .window-content .info-box {
     box-shadow: 1px 1px 20px -6px rgba(0, 0, 0, 0.75);
+    border-radius: 20px;
 }
 
 .window-content .numero-productos {
-    background-color: #34c84a;
+    background-color: #30a542;
     padding: 20px;
     margin-bottom: 20px;
 }
 
 .window-content .numero-caducados {
-    background-color: red;
+    background-color: #ea3b3b;
     padding: 20px;
     margin-bottom: 20px;
 }
 
 .window-content .numero-apunto-caducar {
-    background-color: #ffcc00;
+    background-color: #daba3b;
     padding: 20px;
     margin-bottom: 20px;
 }
@@ -150,7 +178,7 @@ label {
 }
 
 .window-content .bar-code-selector .message-box-container .message-box {
-    background-color: #3c8cbb;
+    background-color: #b5007c;
     width: 85%;
     height: 50%;
     text-align: center;
@@ -238,4 +266,9 @@ footer .toolbar-actions button {
     height: 30px;
     font-size: 15px;
     cursor: pointer;
+}
+
+footer .toolbar-actions button.btn-primary {
+    border-color: #d366b1 #b5007c #b5007c;
+    background-image: linear-gradient(to bottom,#d366b1 0,#b5007c 100%);
 }
