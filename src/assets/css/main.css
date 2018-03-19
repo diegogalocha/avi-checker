@@ -1,7 +1,16 @@
 body {
-	background-color: #b5007c;
-	font-size: 15px;
+    background-color: #b5007c;
+    background-image: url(../images/advanced-vision-iberia.png);
+    background-repeat: no-repeat;
+    font-size: 15px;
     color: white;
+    background-size: 18%;
+    background-position-x: 17px;
+    background-position-y: -25px;
+}
+
+label {
+    font-size: 15px;
 }
 
 .window-content {
