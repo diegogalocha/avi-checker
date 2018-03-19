@@ -3,6 +3,7 @@ import XLSX from 'xlsx'
 window.addEventListener('load', () => {
     // Inicializamos la página para llevar el control de dónde está el usuario
     localStorage.setItem('page', 1);
+    localStorage.setItem('barCodeInputListenerAdded', 0);
     // Añadimos los listener a los botones de Atrás y Siguiente, y al input file
     initializeListeners();
     checkIfShowPreviousOrNextButton(1);
