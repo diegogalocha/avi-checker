@@ -83,7 +83,9 @@ function goToPage(isNext) {
     	// Si el paso es a la página 3, tenemos que dar la funcionalidad al barCodeInput
         if (movement === 3) {
             addFunctionalityOfBarCodeInput();
-    	}
+    	} else if (movement === 1) {
+            document.getElementById('xlf').value = '';
+        }
 
         checkIfShowPreviousOrNextButton(movement);
     }
