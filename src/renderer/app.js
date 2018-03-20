@@ -1,4 +1,11 @@
-import XLSX from 'xlsx'
+import XLSX from 'xlsx';
+var fs = require('fs');
+
+const {ipcRenderer} = require("electron");
+
+ipcRenderer.on("download complete", (event, file) => {
+    console.log(file); // Full file path
+});
 
 window.addEventListener('load', () => {
     // Inicializamos la página para llevar el control de dónde está el usuario
@@ -73,7 +80,7 @@ function goToPage (isNext) {
     var pageNumber = parseInt(localStorage.getItem('page'), 10);
     var movement = isNext ? pageNumber + 1 : pageNumber - 1;
     if (movement === 5) {
-        // TODO Call function export data
+        exportToFile();
     } else {
     	var idToHide = 'page' + pageNumber;
     	var idToShow = 'page' + movement;
@@ -208,13 +215,13 @@ function setProductInfo (item) {
     numeroLoteElement.value = item ? item.id : '';
     descripcionElement.value = item ? item.item_description : '';
     nombreElement.value = item ? item.client_name : '';
-    fechaElement.value = item ? formatDate(getDate(item.delivery_date)) : '';
-    fechaCaducidadElement.value = item ? formatDate(getDate(item.expiration_date)) : '';
+    fechaElement.value = item ? item.delivery_date : '';
+    fechaCaducidadElement.value = item ? item.expiration_date : '';
 }
 
 // Carga el excel en localStorage y devuelve la lista de productos caducados
 function loadXls (path) {
-    var file = XLSX.readFile(path);
+    var file = XLSX.readFile(path, {dateNF: 'd/m/yy'});
     var sheet = file.Sheets[file.SheetNames[0]];
 
     var items = XLSX.utils.sheet_to_json(sheet, {header: [
@@ -230,12 +237,13 @@ function loadXls (path) {
         'sale_price',
         'delivery_date',
         'expiration_date'
-    ], range: 1});
+    ], range: 1, blankrows: true});
 
-    var header1 = items.shift();
-    var header2 = items.shift();
+    items.shift();
+    var header = items.shift();
+    var blankrow = items.shift();
 
-    if (!isValid(header1, header2)) {
+    if (!isValid(header)) {
         return {
             success: false
         }
@@ -245,6 +253,8 @@ function loadXls (path) {
     var aboutExpired = getAboutToExpire(items);
 
     localStorage.setItem('items', JSON.stringify(items));
+    localStorage.setItem('header', JSON.stringify(header));
+    localStorage.setItem('blankrow', JSON.stringify(blankrow));
 
     return {
         success: true,
@@ -288,14 +298,11 @@ function getInfo (id) {
 // Devuelve la fecha de caducidad de un producto como objeto Date
 function getDate (dateString) {
     var parts = dateString.split('/');
-    var year = parts[2];
-    year = year.length === 4 ? year : '20' + year;
+    var year = ((parts[2].length) < 4 ? '20' : '') + parts[2];
+    var month = parts[1] - 1;
+    var day = parts[0];
 
-    return new Date(year, parts[0] - 1, parts[1]);
-}
-
-function formatDate (date) {
-    return date.getDate() + '/' + (date.getMonth() + 1) + '/' + date.getFullYear();
+    return new Date(year, month, day);
 }
 
 // Devuelve si la fecha de caducidad de un producto indica que está caducado
@@ -321,7 +328,6 @@ function getExpired (items) {
 
     for (var item of items) {
         var expirationDate = getDate(item.expiration_date);
-
         if (isExpired(expirationDate)) {
             expired.push(item.item_description);
         }
@@ -346,24 +352,77 @@ function getAboutToExpire (items) {
 }
 
 // Devuelve si el contenido del Excel es válido según sus cabeceras
-function isValid (header1, header2) {
-    var validHeader1 = (header1['client_name'] == 'DEPOSITOS POR DELEGADOS');
+function isValid (header) {
+    return (
+        (header['client_code'] === 'Cód. Cliente') &&
+        (header['client_name'] === 'Nombre Cliente') &&
+        (header['code'] === 'Código') &&
+        (header['delivery_date'] === 'Fecha Albarán') &&
+        (header['delivery_number'] === 'Nº Albarán') &&
+        (header['expiration_date'] === 'Fecha Caducidad') &&
+        (header['id'] === 'Nº Lote') &&
+        (header['item_code'] === 'Cód. Artículo') &&
+        (header['item_description'] === 'Descripción Artículo') &&
+        (header['name'] === 'Nombre') &&
+        (header['sale_price'] === 'Precio Venta') &&
+        (header['units'] === 'Unidades')
+      );
+}
 
-    var validHeader2 = (
-        (header2['client_code'] === 'Cód. Cliente') &&
-        (header2['client_name'] === 'Nombre Cliente') &&
-        (header2['code'] === 'Código') &&
-        (header2['delivery_date'] === 'Fecha Albarán') &&
-        (header2['delivery_number'] === 'Nº Albarán') &&
-        (header2['expiration_date'] === 'Fecha Caducidad') &&
-        (header2['id'] === 'Nº Lote') &&
-        (header2['item_code'] === 'Cód. Artículo') &&
-        (header2['item_description'] === 'Descripción Artículo') &&
-        (header2['name'] === 'Nombre') &&
-        (header2['sale_price'] === 'Precio Venta') &&
-        (header2['units'] === 'Unidades') &&
-        (header2['client_code'] === 'Cód. Cliente')
+function exportToFile() {
+    var items = JSON.parse(localStorage.getItem('items'));
+    var header = JSON.parse(localStorage.getItem('header'));
+    var blankrow = JSON.parse(localStorage.getItem('blankrow'));
+
+    var itemsToExport = [];
+
+    for (var item of items) {
+        var expirationDate = getDate(item.expiration_date);
+        if (!isExpired(expirationDate)) {
+            itemsToExport.push(item);
+        }
+    }
+
+    itemsToExport.unshift(
+      blankrow,
+      {
+        'code' : '',
+        'name' : '',
+        'client_code' : '',
+        'client_name' : 'DEPOSITOS POR DELEGADOS',
+        'item_code' : '',
+        'item_description' : '',
+        'id' : '',
+        'delivery_number' : '',
+        'units' : '',
+        'sale_price' : '',
+        'delivery_date' : '',
+        'expiration_date' : ''
+      },
+      header,
+      blankrow
     );
 
-    return validHeader1 && validHeader2;
+    var ws = XLSX.utils.json_to_sheet(itemsToExport, {skipHeader: true});
+		var wb = XLSX.utils.book_new();
+
+		XLSX.utils.book_append_sheet(wb, ws, 'Hoja 1');
+
+    var filepath = 'exports/export_' + Math.round(+new Date()/1000) + '.xlsx';
+
+    XLSX.writeFile(wb, filepath, {compression:true});
+
+    var fullFilePath = `${__dirname}/../../${filepath}`;
+
+    ipcRenderer.send('download', {
+      url: 'file://' + fullFilePath,
+      properties: {}
+    });
+
+    fs.unlink(fullFilePath, (err) => {
+        if (err) {
+            console.log(err);
+            return;
+        }
+    });
 }

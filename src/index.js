@@ -1,17 +1,14 @@
 'use strict'
 
 // instanciando los objetos app y BrowserWindow
-import { app, BrowserWindow } from 'electron'
+import { app, BrowserWindow, ipcMain } from 'electron'
 import devtools from './devtools'
+
+const {download} = require("electron-dl");
 
 if (process.env.NODE_ENV === 'development') {
   devtools()
 }
-
-// imprimiendo un mensaje en la consola antes de salir
-app.on('before-quit', () => {
-  console.log('Saliendo')
-})
 
 // Ejecutando órdenes cuando la aplicación está lista
 app.on('ready', () => {
@@ -31,7 +28,12 @@ app.on('ready', () => {
     app.quit()
   })
 
-  win.maximize()
-  win.loadURL(`file://${__dirname}/renderer/index.html`)
-  win.toggleDevTools()
+  ipcMain.on('download', (event, info) => {
+        download(BrowserWindow.getFocusedWindow(), info.url, info.properties)
+            .then(dl => window.webContents.send('download complete', dl.getSavePath()));
+    });
+
+  win.maximize();
+  win.loadURL(`file://${__dirname}/renderer/index.html`);
+  win.toggleDevTools();
 })
