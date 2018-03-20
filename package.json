@@ -6,7 +6,10 @@
   "scripts": {
     "dev": "cross-env NODE_ENV=development electron src/index.js",
     "lint": "standard",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "electron-forge start",
+    "package": "electron-forge package",
+    "make": "electron-forge make"
   },
   "author": "",
   "license": "ISC",
@@ -14,12 +17,46 @@
     "cross-env": "^5.1.4",
     "electron-compile": "^6.4.2",
     "electron-debug": "^1.5.0",
+    "electron-squirrel-startup": "^1.0.0",
     "electron-dl": "^1.11.0",
     "standard": "^11.0.0",
     "xlsx": "^0.12.5"
   },
   "devDependencies": {
     "devtron": "^1.4.0",
-    "electron-prebuilt-compile": "^1.8.2"
+    "electron-forge": "^5.1.1",
+    "electron-prebuilt-compile": "1.8.3"
+  },
+  "config": {
+    "forge": {
+      "make_targets": {
+        "win32": [
+          "squirrel"
+        ],
+        "darwin": [
+          "zip"
+        ],
+        "linux": [
+          "deb",
+          "rpm"
+        ]
+      },
+      "electronPackagerConfig": {
+        "packageManager": "npm"
+      },
+      "electronWinstallerConfig": {
+        "name": "platzipics"
+      },
+      "electronInstallerDebian": {},
+      "electronInstallerRedhat": {},
+      "github_repository": {
+        "owner": "",
+        "name": ""
+      },
+      "windowsStoreConfig": {
+        "packageName": "",
+        "name": "platzipics"
+      }
+    }
   }
 }
