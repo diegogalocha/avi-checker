@@ -1,7 +1,6 @@
 import XLSX from 'xlsx';
-var fs = require('fs');
-
-const {ipcRenderer} = require("electron");
+import fs from 'fs';
+import { ipcRenderer } from 'electron';
 
 ipcRenderer.on("download complete", (event, file) => {
     console.log(file); // Full file path
@@ -168,40 +167,51 @@ function debounce (func, wait, immediate) {
 
 // Función que añade los eventos necesarios al input recolector de códigos de barras.
 function getBarCodeSelected (barCodeInput, event) {
-    console.log(event.keyCode);
-    // TODO Obtener el keyCode de la pistola de códigos
     var value = barCodeInput.value;
-    var item = getInfo(value);
-    var status = item.status;
-    let audio;
-
-    setProductInfo(item.item);
     var messageBox = document.getElementById('message-box');
     var messageBoxText = document.getElementById('message-box-text');
-    messageBox.className = 'message-box ' + status;
-    switch (status) {
-        case 'not-found':
-            messageBoxText.innerText = 'No encontrado';
-            break;
-        case 'about-to-expire':
-            messageBoxText.innerText = 'A punto de caducar';
-            audio = new Audio('../sounds/warning.mp3');
-            break;
-        case 'expired':
-            messageBoxText.innerText = 'Caducado';
-            audio = new Audio('../sounds/error.mp3');
-            break;
-        case 'correct':
-            messageBoxText.innerText = 'Correcto';
-            audio = new Audio('../sounds/correct.mp3');
-            break;
-    }
 
-    if (audio) {
-        audio.play();
-    }
+    var reg = new RegExp("^[A-Z0-9]{15}$");
+    var hasMatched = value.match(reg);
+    if (hasMatched) {
+        var item = getInfo(value);
+        var status = item.status;
+        let audio;
 
-    barCodeInput.value = '';
+        setProductInfo(item.item);
+        
+        messageBox.className = 'message-box ' + status;
+        switch (status) {
+            case 'not-found':
+                messageBoxText.innerText = 'No encontrado';
+                break;
+            case 'about-to-expire':
+                messageBoxText.innerText = 'A punto de caducar';
+                audio = new Audio('../sounds/warning.mp3');
+                break;
+            case 'expired':
+                messageBoxText.innerText = 'Caducado';
+                audio = new Audio('../sounds/error.mp3');
+                break;
+            case 'correct':
+                messageBoxText.innerText = 'Correcto';
+                audio = new Audio('../sounds/correct.mp3');
+                break;
+        }
+
+        if (audio) {
+            audio.play();
+        }
+
+        barCodeInput.value = '';
+    } else if (value.length >= 15) {
+        setProductInfo('');
+        messageBox.className = 'message-box not-found';
+        messageBoxText.innerText = 'No encontrado';
+        barCodeInput.value = '';
+    } else {
+        // TODO Avisar de que tiene que poner un código válido
+    }
     // Hay que asegurarse que siempre tenga el focus
 }
 
@@ -224,6 +234,8 @@ function loadXls (path) {
     var file = XLSX.readFile(path, {dateNF: 'd/m/yy'});
     var sheet = file.Sheets[file.SheetNames[0]];
 
+    checkIfColumId(sheet);
+
     var items = XLSX.utils.sheet_to_json(sheet, {header: [
         'code',
         'name',
@@ -239,6 +251,7 @@ function loadXls (path) {
         'expiration_date'
     ], range: 1, blankrows: true});
 
+    console.log(items);
     items.shift();
     var header = items.shift();
     var blankrow = items.shift();
@@ -261,6 +274,21 @@ function loadXls (path) {
         items: items,
         expiredItems: expired,
         aboutToExpiredItems: aboutExpired
+    }
+}
+
+// Comprobamos aquí que la columna H que tiene los ids se parsee como string para 
+// evitar la transformación que hace EXCEL sobre los números largos
+function checkIfColumId(sheet) {
+    var keys = Object.keys(sheet);
+    for(var item of keys) {
+        var column = sheet[item];
+
+        var isIdColumn = item.includes("H");
+        if (isIdColumn && column.t === 'n') {
+            column.v = column.v.toString();
+            column.w = column.v;
+        }
     }
 }
 
