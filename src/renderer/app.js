@@ -251,7 +251,6 @@ function loadXls (path) {
         'expiration_date'
     ], range: 1, blankrows: true});
 
-    console.log(items);
     items.shift();
     var header = items.shift();
     var blankrow = items.shift();
