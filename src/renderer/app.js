@@ -271,6 +271,7 @@ function loadXls (path) {
     var expired = getExpired(items);
     var aboutToExpire = getAboutToExpire(items);
 
+    localStorage.setItem('processed-ids', JSON.stringify([]));
     localStorage.setItem('expired', JSON.stringify([]));
     localStorage.setItem('about-to-expire', JSON.stringify([]));
     localStorage.setItem('correct', JSON.stringify([]));
@@ -320,6 +321,7 @@ function checkIfColumId(sheet) {
 // Devuelve el estado de un producto dado su id
 function getInfo (id) {
     var items = JSON.parse(localStorage.getItem('items'));
+    var processedIds = JSON.parse(localStorage.getItem('processed-ids'));
     var notProcessedData = JSON.parse(localStorage.getItem('not-processed'));
 
     let matchedItem = null;
@@ -328,8 +330,6 @@ function getInfo (id) {
     for (var key in items) {
         if (items[key].id === id) {
             matchedItem = items[key];
-
-            notProcessedData.splice(key, 1);
 
             var expirationDate = getDate(matchedItem.expiration_date);
 
@@ -346,18 +346,43 @@ function getInfo (id) {
         }
     }
 
-    // Process lists internally
-    let statusData = JSON.parse(localStorage.getItem(status));
-
-    if (matchedItem) {
-      statusData.push(matchedItem);
-    } else {
-      statusData.push(id);
+    for (var key in notProcessedData) {
+      if (items[key].id === id) {
+        notProcessedData.splice(key, 1);
+        break;
+      }
     }
 
-    localStorage.setItem(status, JSON.stringify(statusData));
-    localStorage.setItem('not-processed', JSON.stringify(notProcessedData));
-    
+    // Procesar localStorage internamente
+    if (processedIds.indexOf(id) == -1) {
+      processedIds.push(id);
+      localStorage.setItem('processed-ids', JSON.stringify(processedIds));
+
+      var statusData = JSON.parse(localStorage.getItem(status));
+
+      if (matchedItem) {
+        statusData.push(matchedItem);
+      } else {
+        statusData.push({
+          'code' : '',
+          'name' : '',
+          'client_code' : '',
+          'client_name' : '',
+          'item_code' : '',
+          'item_description' : '',
+          'id' : id,
+          'delivery_number' : '',
+          'units' : '',
+          'sale_price' : '',
+          'delivery_date' : '',
+          'expiration_date' : ''
+        },);
+      }
+
+      localStorage.setItem(status, JSON.stringify(statusData));
+      localStorage.setItem('not-processed', JSON.stringify(notProcessedData));
+    }
+
     return {
       'status': status,
       'item': matchedItem
@@ -438,10 +463,17 @@ function isValid (header) {
 }
 
 function exportToFile() {
+    // Obtener datos de localStorage
     var items = JSON.parse(localStorage.getItem('items'));
+    var expired = JSON.parse(localStorage.getItem('expired'));
+    var aboutToExpire = JSON.parse(localStorage.getItem('about-to-expire'));
+    var correct = JSON.parse(localStorage.getItem('correct'));
+    var notProcessed = JSON.parse(localStorage.getItem('not-processed'));
+    var notFound = JSON.parse(localStorage.getItem('not-found'));
     var header = JSON.parse(localStorage.getItem('header'));
     var blankrow = JSON.parse(localStorage.getItem('blankrow'));
 
+    // Exportar solo los no caducados en la hoja principal
     var itemsToExport = [];
 
     for (var item of items) {
@@ -451,6 +483,7 @@ function exportToFile() {
         }
     }
 
+    // Añadir cabeceras del Excel original
     itemsToExport.unshift(
       blankrow,
       {
@@ -471,17 +504,63 @@ function exportToFile() {
       blankrow
     );
 
-    var ws = XLSX.utils.json_to_sheet(itemsToExport, {skipHeader: true});
+    expired.unshift(
+      blankrow,
+      header,
+      blankrow
+    );
+
+    aboutToExpire.unshift(
+      blankrow,
+      header,
+      blankrow
+    );
+
+    correct.unshift(
+      blankrow,
+      header,
+      blankrow
+    );
+
+    notProcessed.unshift(
+      blankrow,
+      header,
+      blankrow
+    );
+
+    notFound.unshift(
+      blankrow,
+      header,
+      blankrow
+    );
+
+    // Convertir arrays de JSON de items en hojas de Excel
+    var itemsSheet = XLSX.utils.json_to_sheet(itemsToExport, {skipHeader: true});
+    var expiredSheet = XLSX.utils.json_to_sheet(expired, {skipHeader: true});
+    var aboutToExpireSheet = XLSX.utils.json_to_sheet(aboutToExpire, {skipHeader: true});
+    var correctSheet = XLSX.utils.json_to_sheet(correct, {skipHeader: true});
+    var notProcessedSheet = XLSX.utils.json_to_sheet(notProcessed, {skipHeader: true});
+    var notFoundSheet = XLSX.utils.json_to_sheet(notFound, {skipHeader: true});
+
+    // Crear la archivo Excel nuevo
 		var wb = XLSX.utils.book_new();
 
-		XLSX.utils.book_append_sheet(wb, ws, 'Hoja 1');
+    // Añadir las hojas
+    XLSX.utils.book_append_sheet(wb, itemsSheet, 'Productos');
+    XLSX.utils.book_append_sheet(wb, expiredSheet, 'Caducados');
+    XLSX.utils.book_append_sheet(wb, aboutToExpireSheet, 'A punto de caducar');
+    XLSX.utils.book_append_sheet(wb, correctSheet, 'Correctos');
+    XLSX.utils.book_append_sheet(wb, notProcessedSheet, 'No procesados');
+    XLSX.utils.book_append_sheet(wb, notFoundSheet, 'No encontrados');
 
+    // Exportar a la carpeta exports dentro del programa
     var filepath = 'exports/export_' + Math.round(+new Date()/1000) + '.xlsx';
 
     XLSX.writeFile(wb, filepath, {compression:true});
 
     var fullFilePath = `${__dirname}/../../${filepath}`;
 
+    // Descargar a la carpeta Descargas del ordenador del usuario
     ipcRenderer.send('download', {
       url: 'file://' + fullFilePath,
       properties: {}
