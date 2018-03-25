@@ -280,11 +280,24 @@ function loadXls (path) {
 // evitar la transformación que hace EXCEL sobre los números largos
 function checkIfColumId(sheet) {
     var keys = Object.keys(sheet);
-    for(var item of keys) {
-        var column = sheet[item];
+    let letter;
+    let idColumnLetter;
+    let column;
 
-        // TODO Cambiar la H por el valor de la cabecera correcta
-        var isIdColumn = item.includes("H");
+    // Este primer for es para obtener la letra del nº de lote
+    for (var item of keys) {
+        letter = item.charAt(0);
+        column = sheet[item];
+        if (column.v === 'Nº Lote') {
+            idColumnLetter = letter;
+            break;
+        }
+    }
+
+    // Transformamos los ids del número de lote en strings
+    for(var item of keys) {
+        column = sheet[item];
+        var isIdColumn = item.includes(letter);
         if (isIdColumn && column.t === 'n') {
             column.v = column.v.toString();
             column.w = column.v;
