@@ -4,6 +4,7 @@
 import { app, BrowserWindow, ipcMain } from 'electron';
 import devtools from './devtools';
 import { download } from 'electron-dl';
+import del from 'del';
 
 if (process.env.NODE_ENV === 'development') {
   devtools();
@@ -35,4 +36,6 @@ app.on('ready', () => {
   win.maximize();
   win.loadURL(`file://${__dirname}/renderer/index.html`);
   win.toggleDevTools();
+
+  del([`${__dirname}/../exports/*.xlsx`]);
 })

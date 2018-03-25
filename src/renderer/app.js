@@ -1,5 +1,4 @@
 import XLSX from 'xlsx';
-import fs from 'fs';
 import { ipcRenderer } from 'electron';
 
 ipcRenderer.on("download complete", (event, file) => {
@@ -179,7 +178,7 @@ function getBarCodeSelected (barCodeInput, event) {
         let audio;
 
         setProductInfo(item.item);
-        
+
         messageBox.className = 'message-box ' + status;
         switch (status) {
             case 'not-found':
@@ -276,7 +275,7 @@ function loadXls (path) {
     }
 }
 
-// Comprobamos aquí que la columna H que tiene los ids se parsee como string para 
+// Comprobamos aquí que la columna H que tiene los ids se parsee como string para
 // evitar la transformación que hace EXCEL sobre los números largos
 function checkIfColumId(sheet) {
     var keys = Object.keys(sheet);
@@ -457,12 +456,5 @@ function exportToFile() {
     ipcRenderer.send('download', {
       url: 'file://' + fullFilePath,
       properties: {}
-    });
-
-    fs.unlink(fullFilePath, (err) => {
-        if (err) {
-            console.log(err);
-            return;
-        }
     });
 }
