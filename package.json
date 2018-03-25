@@ -1,7 +1,7 @@
 {
-  "name": "platzipics",
+  "name": "avi-checker",
   "version": "1.0.0",
-  "description": "Aplicación de electron para visualizar imágenes",
+  "description": "Aplicación para revisión de stock en AVI",
   "main": "src/index.js",
   "scripts": {
     "dev": "cross-env NODE_ENV=development electron src/index.js",

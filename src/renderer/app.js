@@ -1,4 +1,17 @@
 import XLSX from 'xlsx';
+import { ipcRenderer } from 'electron';
+
+ipcRenderer.on("download_complete", (event, file) => {
+    let successMessage = document.getElementById('download-message');
+    let filePath = document.getElementById('filepath');
+    let nextButton = document.getElementById('next');
+    successMessage.style.top = '125px';
+    filePath.innerText = file;
+    nextButton.innerText = 'Exportar a excel';
+    setTimeout(function() {
+        successMessage.style.top = '-250px';
+    }, 5000);
+});
 
 window.addEventListener('load', () => {
     // Inicializamos la página para llevar el control de dónde está el usuario
@@ -482,6 +495,7 @@ function isValid (header) {
 }
 
 function exportToFile() {
+    let nextButton = document.getElementById('next').innerText = 'Generando';
     // Obtener datos de localStorage
     var items = JSON.parse(localStorage.getItem('items'));
     var expired = JSON.parse(localStorage.getItem('expired'));
