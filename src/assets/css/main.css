@@ -11,7 +11,7 @@ body {
 
 body .download-message {
     position: absolute;
-    width: 60%;
+    width: 50%;
     height: auto;
     left: 0;
     right: 0;
@@ -20,11 +20,16 @@ body .download-message {
     background-color: #30a542;
     box-shadow: 1px 1px 20px -6px rgba(0, 0, 0, 0.75);
     text-align: center;
+    padding: 20px 0;
+    transition-property: top;
+    transition-duration: 0.5s;
     -webkit-transition-property: top;
     -webkit-transition-duration: 0.5s;
+
 }
 
 body .download-message p {
+    font-size: 22px;
     padding: 0;
 }
 
@@ -265,7 +270,10 @@ input {
 }
 
 .window-content.last-page {
-    align-items: left;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
 }
 
 .window-content.last-page h1 {
@@ -273,12 +281,21 @@ input {
     text-align: center;
 }
 
-.window-content.last-page p {
-    text-align: left;
+.window-content.last-page .items-number {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding: 10px;
+    margin: 0 auto;
+    width: 380px;
 }
 
-.window-content.last-page h1, p {
-    padding: 0 100px;
+.window-content.last-page .items-number img{
+    width: 40px;
+    height: 40px;
+    margin-right: 5px;
+    background-color: white;
+    border-radius: 50%;
 }
 
 footer {

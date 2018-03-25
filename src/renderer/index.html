@@ -74,14 +74,31 @@
         </div>
     </div>
     <div id="page4" class="window-content avi-content last-page hidden">
-        <h1>Resumen de actividad</h1>
-        <p>A continuación puede ver un resumen de su actividad. Cuando termine de revisar, pulse en "Exportar datos" para generar un excel actualizado. Éste contendrá dos páginas:</p>
-        <p> - En la primera página obtendrá un archivo como el que introdujo inicialmente actualizado según su actividad.</p>
-        <p> - En la segunda página obtendrá un resumen detallado de las operaciones realizadas.</p>
+        <h1>Resumen de actividad:</h1>
+        <div class="items-number">
+            <img src="../assets/icons/checked.svg">
+            <h4 id="correcText"></h4>
+        </div>
+        <div class="items-number">
+            <img src="../assets/icons/warning.svg">
+            <h4 id="aboutToExpireText"></h4>
+        </div>
+        <div class="items-number">
+            <img src="../assets/icons/cancel.svg">
+            <h4 id="expiredText"></h4>
+        </div>
+        <div class="items-number">
+            <img src="../assets/icons/question.svg">
+            <h4 id="notFoundText"></h4>
+        </div>
+        <div class="items-number">
+            <img src="../assets/icons/barcode.png">
+            <h4 id="notProcessedText"></h4>
+        </div>
     </div>
 
     <div id="download-message" class="download-message">
-        <p>Archivo exportado con éxito en:</p>
+        <h3>Archivo exportado con éxito en:</h3>
         <p id="filepath"></p>
     </div>
 

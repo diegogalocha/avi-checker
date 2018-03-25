@@ -7,7 +7,7 @@ ipcRenderer.on("download_complete", (event, file) => {
     successMessage.style.top = '125px';
     filePath.innerText = file;
     setTimeout(function() {
-        successMessage.style.top = '-120px';
+        successMessage.style.top = '-250px';
     }, 5000);
 });
 
@@ -107,6 +107,8 @@ function goToPage (isNext) {
             document.getElementById('xlf').value = '';
             document.getElementById('file-name-span').innerText = '';
             document.getElementById('span-input-file').innerText = 'Seleccione un archivo';
+        } else if (movement === 4) {
+            getListsOfItems();
         }
 
         checkIfShowPreviousOrNextButton(movement);
@@ -484,4 +486,19 @@ function exportToFile() {
       url: 'file://' + fullFilePath,
       properties: {}
     });
+}
+
+// Obtenemos la lista de items de cada tipo para mostrarlos en el resumen
+function getListsOfItems() {
+    let aboutToExpireItems = JSON.parse(localStorage.getItem('about-to-expire')).length ? JSON.parse(localStorage.getItem('about-to-expire')).length : 0;
+    let correctItems = JSON.parse(localStorage.getItem('correct')).length ? JSON.parse(localStorage.getItem('correct')).length : 0;
+    let expiredItems = JSON.parse(localStorage.getItem('expired')).length ? JSON.parse(localStorage.getItem('expired')).length : 0;
+    let notFoundItems = JSON.parse(localStorage.getItem('not-found')).length ? JSON.parse(localStorage.getItem('not-found')).length : 0;
+    let notProcessedItems = JSON.parse(localStorage.getItem('not-processed')).length ? JSON.parse(localStorage.getItem('not-processed')).length : 0;
+
+    document.getElementById('aboutToExpireText').innerText = aboutToExpireItems !== 1 ? aboutToExpireItems + ' elementos a punto de caducar.' : aboutToExpireItems + ' elemento a punto de caducar.';
+    document.getElementById('correcText').innerText = correctItems !== 1 ? correctItems + ' elementos correctos.' : correctItems + ' elemento correcto';
+    document.getElementById('expiredText').innerText = expiredItems !== 1 ? expiredItems + ' elementos caducados.' : expiredItems + ' elemento caducado';
+    document.getElementById('notFoundText').innerText = notFoundItems !== 1 ? notFoundItems + ' elementos no encontrados.' : notFoundItems + ' elemento no encontrado.';
+    document.getElementById('notProcessedText').innerText = notProcessedItems !== 1 ? notProcessedItems + ' elementos no procesados.' : notProcessedItems + ' elemento no procesado.';
 }
