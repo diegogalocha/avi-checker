@@ -433,7 +433,7 @@ function getDate (dateString) {
 function isExpired (expirationDate) {
     var now = new Date();
 
-    return expirationDate < now;
+    return expirationDate <= now;
 }
 
 // Devuelve si la fecha de caducidad de un producto indica que está a punto de caducar
