@@ -342,12 +342,10 @@ function checkIfColumnPrice(sheet) {
         letter = item.charAt(0);
         column = sheet[item];
         if (column.v === 'Precio Venta') {
-          debugger
             return true;
         }
     }
-debugger
-  return false
+    return false
 }
 
 // Devuelve el estado de un producto dado su id
