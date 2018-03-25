@@ -3,9 +3,7 @@
 // instanciando los objetos app y BrowserWindow
 import { app, BrowserWindow, ipcMain } from 'electron';
 import devtools from './devtools';
-import { download } from 'electron-dl';
 import path from 'path';
-import del from 'del';
 
 if (process.env.NODE_ENV === 'development') {
     devtools();
@@ -30,15 +28,7 @@ app.on('ready', () => {
         app.quit();
     });
 
-    ipcMain.on('download', (event, info) => {
-        download(BrowserWindow.getFocusedWindow(), info.url, info.properties)
-            .then(dl => win.webContents.send('download_complete', dl.getSavePath()));
-    });
-
     win.maximize();
     win.loadURL(`file://${__dirname}/renderer/index.html`);
     win.toggleDevTools();
-
-    // Eliminar archivos de exportaciones antiguas
-    del([`${__dirname}/../exports/*.xlsx`]);
 });

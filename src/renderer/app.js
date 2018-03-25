@@ -1,15 +1,4 @@
 import XLSX from 'xlsx';
-import { ipcRenderer } from 'electron';
-
-ipcRenderer.on("download_complete", (event, file) => {
-    let successMessage = document.getElementById('download-message');
-    let filePath = document.getElementById('filepath');
-    successMessage.style.top = '125px';
-    filePath.innerText = file;
-    setTimeout(function() {
-        successMessage.style.top = '-250px';
-    }, 5000);
-});
 
 window.addEventListener('load', () => {
     // Inicializamos la página para llevar el control de dónde está el usuario
@@ -571,17 +560,9 @@ function exportToFile() {
     XLSX.utils.book_append_sheet(wb, notFoundSheet, 'No encontrados');
 
     // Exportar a la carpeta exports dentro del programa
-    var filepath = 'exports/export_' + Math.round(+new Date()/1000) + '.xlsx';
+    var filepath = '../export_' + Math.round(+new Date()/1000) + '.xlsx';
 
     XLSX.writeFile(wb, filepath, {compression:true});
-
-    var fullFilePath = `${__dirname}/../../${filepath}`;
-
-    // Descargar a la carpeta Descargas del ordenador del usuario
-    ipcRenderer.send('download', {
-      url: 'file://' + fullFilePath,
-      properties: {}
-    });
 }
 
 // Obtenemos la lista de items de cada tipo para mostrarlos en el resumen
