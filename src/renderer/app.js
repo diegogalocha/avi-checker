@@ -178,7 +178,7 @@ function getBarCodeSelected (barCodeInput, event) {
     var messageBox = document.getElementById('message-box');
     var messageBoxText = document.getElementById('message-box-text');
 
-    var reg = new RegExp("^[A-Z0-9]{15}$");
+    var reg = new RegExp("^[A-Za-z0-9]{15}$");
     var hasMatched = value.match(reg);
     if (hasMatched) {
         var item = getInfo(value);
