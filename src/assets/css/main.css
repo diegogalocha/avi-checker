@@ -281,5 +281,17 @@ footer .toolbar-actions button {
 
 footer .toolbar-actions button.btn-primary {
     border-color: #d366b1 #b5007c #b5007c;
-    background-image: linear-gradient(to bottom,#d366b1 0,#b5007c 100%);
+    background-image: linear-gradient(to bottom,#d366b1 0,#d366b1 100%);
+}
+
+footer .toolbar-actions button.btn-primary:hover{
+    background-image: linear-gradient(to bottom,#f579ce 0,#b5007c 100%);
+}
+
+footer .toolbar-actions button.btn-default {
+    background-image: linear-gradient(to bottom,#fcfcfc 0,#b1b3b4 100%);
+}
+
+footer .toolbar-actions button.btn-default:hover{
+    background-image: linear-gradient(to bottom,#fcfcfc 0,#929091 100%);
 }

@@ -2,6 +2,7 @@ import XLSX from 'xlsx';
 import { ipcRenderer } from 'electron';
 
 ipcRenderer.on("download complete", (event, file) => {
+    // TODO Show message of complete
     console.log(file); // Full file path
 });
 
@@ -275,7 +276,7 @@ function loadXls (path) {
     }
 }
 
-// Comprobamos aquí que la columna H que tiene los ids se parsee como string para
+// Comprobamos aquí que la columna que tiene los ids se parsee como string para 
 // evitar la transformación que hace EXCEL sobre los números largos
 function checkIfColumId(sheet) {
     var keys = Object.keys(sheet);
