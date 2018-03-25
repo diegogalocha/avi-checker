@@ -49,7 +49,7 @@ function checkFileAndGetExpired (file) {
         if (response.success) {
             errorElement.style.display = 'none';
             goToPage(true);
-            setResumeValues(response.items, response.expiredItems, response.aboutToExpiredItems);
+            setResumeValues(response.items, response.expiredItems, response.aboutToExpireItems);
         } else {
             errorElement.style.display = 'block';
             document.getElementById('span-input-file').innerText = 'Seleccione un archivo válido';
@@ -68,13 +68,13 @@ function setFileName(name) {
 }
 
 // Función que inyecta los valores para el resumen de la segunda página
-function setResumeValues (items, expiredItems, aboutExpiredItems) {
+function setResumeValues (items, expiredItems, aboutToExpireItems) {
     let numberOfProducts = document.getElementById('numero-productos');
     let numberOfExpired = document.getElementById('numero-caducados');
-    let numberOfAboutToExpired = document.getElementById('numero-apunto-caducar');
+    let numberOfAboutToExpire = document.getElementById('numero-apunto-caducar');
     numberOfProducts.innerText = 'Se han cargado ' + items.length + ' productos del archivo.';
     numberOfExpired.innerText = 'Tiene ' + expiredItems.length + ' productos caducados.';
-    numberOfAboutToExpired.innerText = 'Tiene ' + aboutExpiredItems.length + ' productos a punto de caducar.';
+    numberOfAboutToExpire.innerText = 'Tiene ' + aboutToExpireItems.length + ' productos a punto de caducar.';
 }
 
 // Función que lanza al usuario a la página indicada. "isNext" nos sirve
@@ -267,8 +267,13 @@ function loadXls (path) {
     }
 
     var expired = getExpired(items);
-    var aboutExpired = getAboutToExpire(items);
+    var aboutToExpire = getAboutToExpire(items);
 
+    localStorage.setItem('expired', JSON.stringify([]));
+    localStorage.setItem('about-to-expire', JSON.stringify([]));
+    localStorage.setItem('correct', JSON.stringify([]));
+    localStorage.setItem('not-found', JSON.stringify([]));
+    localStorage.setItem('not-processed', JSON.stringify(items));
     localStorage.setItem('items', JSON.stringify(items));
     localStorage.setItem('header', JSON.stringify(header));
     localStorage.setItem('blankrow', JSON.stringify(blankrow));
@@ -277,11 +282,11 @@ function loadXls (path) {
         success: true,
         items: items,
         expiredItems: expired,
-        aboutToExpiredItems: aboutExpired
+        aboutToExpireItems: aboutToExpire
     }
 }
 
-// Comprobamos aquí que la columna que tiene los ids se parsee como string para 
+// Comprobamos aquí que la columna que tiene los ids se parsee como string para
 // evitar la transformación que hace EXCEL sobre los números largos
 function checkIfColumId(sheet) {
     var keys = Object.keys(sheet);
@@ -313,14 +318,18 @@ function checkIfColumId(sheet) {
 // Devuelve el estado de un producto dado su id
 function getInfo (id) {
     var items = JSON.parse(localStorage.getItem('items'));
+    var notProcessedData = JSON.parse(localStorage.getItem('not-processed'));
 
     let matchedItem = null;
     let status = 'not-found';
 
-    for (var item of items) {
-        if (item.id === id) {
-            matchedItem = item;
-            var expirationDate = getDate(item.expiration_date);
+    for (var key in items) {
+        if (items[key].id === id) {
+            matchedItem = items[key];
+
+            notProcessedData.splice(key, 1);
+
+            var expirationDate = getDate(matchedItem.expiration_date);
 
             if (isExpired(expirationDate)) {
                 status = 'expired';
@@ -335,9 +344,21 @@ function getInfo (id) {
         }
     }
 
+    // Process lists internally
+    let statusData = JSON.parse(localStorage.getItem(status));
+
+    if (matchedItem) {
+      statusData.push(matchedItem);
+    } else {
+      statusData.push(id);
+    }
+
+    localStorage.setItem(status, JSON.stringify(statusData));
+    localStorage.setItem('not-processed', JSON.stringify(notProcessedData));
+    
     return {
-    'status': status,
-    'item': matchedItem
+      'status': status,
+      'item': matchedItem
     }
 }
 
@@ -384,17 +405,17 @@ function getExpired (items) {
 
 // Devolver los productos a punto de caducar
 function getAboutToExpire (items) {
-    var aboutToExpired = [];
+    var aboutToExpire = [];
 
     for (var item of items) {
         var expirationDate = getDate(item.expiration_date);
 
         if (isAboutToExpire(expirationDate)) {
-            aboutToExpired.push(item.item_description);
+            aboutToExpire.push(item.item_description);
         }
     }
 
-    return aboutToExpired;
+    return aboutToExpire;
 }
 
 // Devuelve si el contenido del Excel es válido según sus cabeceras

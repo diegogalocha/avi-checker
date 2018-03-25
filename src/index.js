@@ -39,5 +39,6 @@ app.on('ready', () => {
     win.loadURL(`file://${__dirname}/renderer/index.html`);
     win.toggleDevTools();
 
+    // Delete old export data files
     del([`${__dirname}/../exports/*.xlsx`]);
 });
