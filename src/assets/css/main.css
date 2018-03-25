@@ -10,27 +10,47 @@ body {
 }
 
 body .download-message {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
     position: absolute;
     width: 50%;
     height: auto;
     left: 0;
     right: 0;
     margin: 0 auto;
-    top: -100px;
+    top: -200px;
     background-color: #30a542;
     box-shadow: 1px 1px 20px -6px rgba(0, 0, 0, 0.75);
     text-align: center;
-    padding: 20px 0;
+    padding: 20px 30px;
+    border-radius: 6px;
     transition-property: top;
     transition-duration: 0.5s;
     -webkit-transition-property: top;
     -webkit-transition-duration: 0.5s;
-
 }
 
-body .download-message p {
+body .download-message img {
+    width: 60px;
+    height: 60px;
+    background-color: white;
+    border-radius: 50%;
+}
+
+body .download-message .info-text {
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+    width: 90%;
+}
+
+body .download-message .info-text p {
     font-size: 22px;
     padding: 0;
+    margin: 0;
 }
 
 label {
@@ -296,6 +316,29 @@ input {
     margin-right: 5px;
     background-color: white;
     border-radius: 50%;
+}
+
+.window-content.last-page .info-download {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin: 20px auto;
+    width: 60%;
+    border: 1px solid;
+    text-align: center;
+    padding: 20px 25px;
+}
+
+.window-content.last-page .info-download img {
+    background-color: white;
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+}
+
+.window-content.last-page .info-download p {
+    padding: 0;
+    margin: 0;
 }
 
 footer {
