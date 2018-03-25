@@ -242,8 +242,9 @@ function loadXls (path) {
     var sheet = file.Sheets[file.SheetNames[0]];
 
     checkIfColumId(sheet);
+    var thereIsPrice = checkIfColumnPrice(sheet);
 
-    var items = XLSX.utils.sheet_to_json(sheet, {header: [
+    var defaultHeader = (thereIsPrice) ? [
         'code',
         'name',
         'client_code',
@@ -256,7 +257,21 @@ function loadXls (path) {
         'sale_price',
         'delivery_date',
         'expiration_date'
-    ], range: 1, blankrows: true});
+    ] : [
+        'code',
+        'name',
+        'client_code',
+        'client_name',
+        'item_code',
+        'item_description',
+        'id',
+        'delivery_number',
+        'units',
+        'delivery_date',
+        'expiration_date'
+    ];
+
+    var items = XLSX.utils.sheet_to_json(sheet, {header: defaultHeader, range: 1, blankrows: true});
 
     items.shift();
     var header = items.shift();
@@ -316,6 +331,23 @@ function checkIfColumId(sheet) {
             column.w = column.v;
         }
     }
+}
+
+function checkIfColumnPrice(sheet) {
+    var keys = Object.keys(sheet);
+    let letter;
+    let column;
+
+    for (var item of keys) {
+        letter = item.charAt(0);
+        column = sheet[item];
+        if (column.v === 'Precio Venta') {
+          debugger
+            return true;
+        }
+    }
+debugger
+  return false
 }
 
 // Devuelve el estado de un producto dado su id
@@ -486,20 +518,7 @@ function exportToFile() {
     // Añadir cabeceras del Excel original
     itemsToExport.unshift(
       blankrow,
-      {
-        'code' : '',
-        'name' : '',
-        'client_code' : '',
-        'client_name' : 'DEPOSITOS POR DELEGADOS',
-        'item_code' : '',
-        'item_description' : '',
-        'id' : '',
-        'delivery_number' : '',
-        'units' : '',
-        'sale_price' : '',
-        'delivery_date' : '',
-        'expiration_date' : ''
-      },
+      blankrow,
       header,
       blankrow
     );
