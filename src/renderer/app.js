@@ -1,9 +1,14 @@
 import XLSX from 'xlsx';
 import { ipcRenderer } from 'electron';
 
-ipcRenderer.on("download complete", (event, file) => {
-    // TODO Show message of complete
-    console.log(file); // Full file path
+ipcRenderer.on("download_complete", (event, file) => {
+    let successMessage = document.getElementById('download-message');
+    let filePath = document.getElementById('filepath');
+    successMessage.style.top = '125px';
+    filePath.innerText = file;
+    setTimeout(function() {
+        successMessage.style.top = '-120px';
+    }, 5000);
 });
 
 window.addEventListener('load', () => {

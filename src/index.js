@@ -32,7 +32,7 @@ app.on('ready', () => {
 
     ipcMain.on('download', (event, info) => {
         download(BrowserWindow.getFocusedWindow(), info.url, info.properties)
-            .then(dl => window.webContents.send('download complete', dl.getSavePath()));
+            .then(dl => win.webContents.send('download_complete', dl.getSavePath()));
     });
 
     win.maximize();
