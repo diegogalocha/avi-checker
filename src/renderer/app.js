@@ -283,6 +283,7 @@ function checkIfColumId(sheet) {
     for(var item of keys) {
         var column = sheet[item];
 
+        // TODO Cambiar la H por el valor de la cabecera correcta
         var isIdColumn = item.includes("H");
         if (isIdColumn && column.t === 'n') {
             column.v = column.v.toString();
@@ -391,7 +392,6 @@ function isValid (header) {
         (header['item_code'] === 'Cód. Artículo') &&
         (header['item_description'] === 'Descripción Artículo') &&
         (header['name'] === 'Nombre') &&
-        (header['sale_price'] === 'Precio Venta') &&
         (header['units'] === 'Unidades')
       );
 }
