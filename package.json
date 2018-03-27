@@ -26,7 +26,8 @@
   "devDependencies": {
     "devtron": "^1.4.0",
     "electron-forge": "^5.1.1",
-    "electron-prebuilt-compile": "1.8.3"
+    "electron-prebuilt-compile": "1.8.3",
+    "electron-winstaller": "^2.6.4"
   },
   "config": {
     "forge": {
