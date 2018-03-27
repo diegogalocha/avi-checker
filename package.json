@@ -49,7 +49,7 @@
         "icon": "src/assets/icons/main-icon"
       },
       "electronWinstallerConfig": {
-        "name": "platzipics"
+        "name": "avi-checker"
       },
       "electronInstallerDebian": {},
       "electronInstallerRedhat": {},
@@ -59,7 +59,7 @@
       },
       "windowsStoreConfig": {
         "packageName": "",
-        "name": "platzipics"
+        "name": "avi-checker"
       }
     }
   }

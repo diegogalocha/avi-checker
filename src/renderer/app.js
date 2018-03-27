@@ -1,17 +1,12 @@
 import XLSX from 'xlsx';
-import { ipcRenderer } from 'electron';
+import { ipcMain, ipcRenderer } from 'electron';
+// import { setIpc, openDirectory, saveFile } from './ipcRendererEvents'
 
-ipcRenderer.on("download_complete", (event, file) => {
-    let successMessage = document.getElementById('download-message');
-    let filePath = document.getElementById('filepath');
-    let nextButton = document.getElementById('next');
-    successMessage.style.top = '125px';
-    filePath.innerText = file;
-    nextButton.innerText = 'Exportar a excel';
-    setTimeout(function() {
-        successMessage.style.top = '-250px';
-    }, 5000);
-});
+/*function buttonEvent(id, func) {
+    debugger;
+    const openDirectory = document.getElementById(id);
+    openDirectory.addEventListener('click', func);
+}*/
 
 window.addEventListener('load', () => {
     // Inicializamos la página para llevar el control de dónde está el usuario
@@ -28,6 +23,8 @@ function initializeListeners () {
     let nextButton = document.getElementById('next');
     let xlfInput = document.getElementById('xlf');
 
+    // let openDirectory = document.getElementById('open-directory');
+
     previousButton.addEventListener('click', function () {
         goToPage(false);
     });
@@ -39,6 +36,11 @@ function initializeListeners () {
     xlfInput.addEventListener('change', function () {
         checkFileAndGetExpired(xlfInput.files[0]);
     });
+
+    /*openDirectory.addEventListener('click', function() {
+        debugger;
+        buttonEvent('open-directory', openDirectory);
+    });*/
 }
 
 // Función que chequea si el archivo seleccionado es válido para mostrar un error
@@ -563,7 +565,7 @@ function exportToFile() {
     var notFoundSheet = XLSX.utils.json_to_sheet(notFound, {skipHeader: true});
 
     // Crear la archivo Excel nuevo
-		var wb = XLSX.utils.book_new();
+	var wb = XLSX.utils.book_new();
 
     // Añadir las hojas
     XLSX.utils.book_append_sheet(wb, itemsSheet, 'Productos');
@@ -574,9 +576,35 @@ function exportToFile() {
     XLSX.utils.book_append_sheet(wb, notFoundSheet, 'No encontrados');
 
     // Exportar a la carpeta exports dentro del programa
-    var filepath = '../export_' + Math.round(+new Date()/1000) + '.xlsx';
+    var filename = 'export_' + Math.round(+new Date()/1000) + '.xlsx';
+    var filepath = '../' + filename;
 
     XLSX.writeFile(wb, filepath, {compression:true});
+
+    var dirNameSplitted = __dirname.split('/');
+    var downloadPath;
+    if (dirNameSplitted.length === 1) {
+        downloadPath = 'La ruta de la aplicación con nombre ' + filename;
+    } else {
+        dirNameSplitted.splice(dirNameSplitted.length - 3, 3);
+        downloadPath = dirNameSplitted.join('/');
+        downloadPath = downloadPath + '/' + filename;
+    }
+
+    showExportedMessage(downloadPath);
+}
+
+// Función que muestra un mensaje de éxito cuando la descarga se ha realizado
+function showExportedMessage(downloadPath) {
+    let successMessage = document.getElementById('download-message');
+    let filePath = document.getElementById('filepath');
+    let nextButton = document.getElementById('next');
+    successMessage.style.top = '125px';
+    filePath.innerText = downloadPath;
+    nextButton.innerText = 'Exportar a excel';
+    setTimeout(function() {
+        successMessage.style.top = '-250px';
+    }, 5000);
 }
 
 // Obtenemos la lista de items de cada tipo para mostrarlos en el resumen

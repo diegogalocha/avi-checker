@@ -1,7 +1,7 @@
 'use strict';
 
 // instanciando los objetos app y BrowserWindow
-import { app, BrowserWindow, ipcMain } from 'electron';
+import { app, BrowserWindow, ipcMain, ipcRenderer, dialog } from 'electron';
 import devtools from './devtools';
 import path from 'path';
 
@@ -9,9 +9,11 @@ if (process.env.NODE_ENV === 'development') {
     devtools();
 }
 
+let win;
+
 // Ejecutando órdenes cuando la aplicación está lista
 app.on('ready', () => {
-    let win = new BrowserWindow({
+    win = new BrowserWindow({
         title: 'AVI Checker',
         center: true,
         show: false,
@@ -32,3 +34,15 @@ app.on('ready', () => {
     win.loadURL(`file://${__dirname}/renderer/index.html`);
     win.toggleDevTools();
 });
+
+/*ipcMain.on('open-directory', function(event) {
+    debugger;
+    dialog.showOpenDialog(win, {
+        title: 'Seleccione ubicación',
+        buttonLabel: 'Abrir ubicación',
+        properties: ['openDirectory']
+    }, function(dir) {
+        debugger;
+        console.log(dir);
+    })
+});*/

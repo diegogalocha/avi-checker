@@ -20,6 +20,6 @@ function getInstallerConfig () {
     outputDirectory: path.join(outPath, 'windows-installer'),
     exe: 'avi-checker-app.exe',
     setupExe: 'AviCheckerAppInstaller.exe',
-    setupIcon: path.join(rootPath, 'assets', 'icons', 'main-icon.ico')
+    setupIcon: path.join(__dirname, 'assets', 'icon', 'main-icon.png')
   })
 }
