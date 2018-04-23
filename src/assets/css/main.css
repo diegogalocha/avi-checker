@@ -140,7 +140,7 @@ input {
     margin-left: 10px;
 }
 
-.window-content .select-input .error-message {
+.window-content .error-message {
     color: red;
     background-color: white;
     padding: 5px 20px;
