@@ -244,6 +244,9 @@ function setProductInfo (item) {
 function loadXls (path) {
     var file = XLSX.readFile(path, {dateNF: 'd/m/yy'});
     var sheet = file.Sheets[file.SheetNames[0]];
+    // Ocultamos el error que sale en la segunda página cada vez que carguemos un archivo nuevo
+    var errorElement = document.getElementById('format-error-dates');
+    errorElement.style.display = 'none';
 
     checkIfColumId(sheet);
     var thereIsPrice = checkIfColumnPrice(sheet);
