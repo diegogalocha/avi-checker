@@ -455,9 +455,13 @@ function getExpired (items) {
     var expired = [];
 
     for (var item of items) {
-        var expirationDate = getDate(item.expiration_date);
-        if (isExpired(expirationDate)) {
-            expired.push(item.item_description);
+        if (item.expiration_date) {
+            var expirationDate = getDate(item.expiration_date);
+            if (isExpired(expirationDate)) {
+                expired.push(item.item_description);
+            }
+        } else {
+            showErrorInFile();
         }
     }
 
@@ -469,10 +473,14 @@ function getAboutToExpire (items) {
     var aboutToExpire = [];
 
     for (var item of items) {
-        var expirationDate = getDate(item.expiration_date);
+        if (item.expiration_date) {
+            var expirationDate = getDate(item.expiration_date);
 
-        if (isAboutToExpire(expirationDate)) {
-            aboutToExpire.push(item.item_description);
+            if (isAboutToExpire(expirationDate)) {
+                aboutToExpire.push(item.item_description);
+            }
+        } else {
+            showErrorInFile();
         }
     }
 
@@ -620,4 +628,11 @@ function getListsOfItems() {
     document.getElementById('expiredText').innerText = expiredItems !== 1 ? expiredItems + ' elementos caducados.' : expiredItems + ' elemento caducado';
     document.getElementById('notFoundText').innerText = notFoundItems !== 1 ? notFoundItems + ' elementos no encontrados.' : notFoundItems + ' elemento no encontrado.';
     document.getElementById('notProcessedText').innerText = notProcessedItems !== 1 ? notProcessedItems + ' elementos no procesados.' : notProcessedItems + ' elemento no procesado.';
+}
+
+// Function that show an error if the file contains a product row without expiration_date
+function showErrorInFile() {
+    var errorElement = document.getElementById('format-error-dates');
+    errorElement.style.display = 'block';
+    errorElement.innerText = 'El archivo cargado posee productos sin fecha de caducidad';
 }
