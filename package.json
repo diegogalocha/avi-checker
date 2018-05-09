@@ -11,7 +11,8 @@
     "package-mac": "electron-forge package --platform=darwin --arch=x64",
     "package-win": "electron-forge package --platform=win32 --arch=ia32",
     "package-linux": "electron-forge package --platform=linux --arch=x64",
-    "make": "electron-forge make"
+    "make": "electron-forge make",
+    "dist": "electron-builder"
   },
   "author": "",
   "license": "ISC",
@@ -28,6 +29,14 @@
     "electron-forge": "^5.1.1",
     "electron-prebuilt-compile": "1.8.3",
     "electron-winstaller": "^2.6.4"
+  },
+  "build": {
+    "appId": "avi-checker",
+    "productName": "AVI Checker",
+    "win": {
+      "target": "nsis",
+      "icon": "src/assets/icons/main-icon.ico"
+    }
   },
   "config": {
     "forge": {

@@ -1,5 +1,8 @@
 import XLSX from 'xlsx';
 import { ipcMain, ipcRenderer } from 'electron';
+// const {app} = require('electron').remote;
+// var userDataPath = app.getPath('downloads');
+
 // import { setIpc, openDirectory, saveFile } from './ipcRendererEvents'
 
 /*function buttonEvent(id, func) {
@@ -428,12 +431,17 @@ function getInfo (id) {
 
 // Devuelve la fecha de caducidad de un producto como objeto Date
 function getDate (dateString) {
-    var parts = dateString.split('/');
-    var year = ((parts[2].length) < 4 ? '20' : '') + parts[2];
-    var month = parts[1] - 1;
-    var day = parts[0];
+    if (dateString) {
+        var parts = dateString.split('/');
+        var year = ((parts[2].length) < 4 ? '20' : '') + parts[2];
+        var month = parts[1] - 1;
+        var day = parts[0];
 
-    return new Date(year, month, day);
+        return new Date(year, month, day);
+    }
+
+    return new Date();
+
 }
 
 // Devuelve si la fecha de caducidad de un producto indica que está caducado
@@ -602,7 +610,13 @@ function exportToFile() {
         downloadPath = downloadPath + '/' + filename;
     }
 
-    showExportedMessage(downloadPath);
+    var urlToDownload = `file://${__dirname}/../../../${filename}`;
+    ipcRenderer.send("download", {
+        url: urlToDownload,
+        properties: {directory: downloadPath, saveAs: true}
+    });
+    showExportedMessage(urlToDownload);
+
 }
 
 // Función que muestra un mensaje de éxito cuando la descarga se ha realizado
@@ -611,11 +625,11 @@ function showExportedMessage(downloadPath) {
     let filePath = document.getElementById('filepath');
     let nextButton = document.getElementById('next');
     successMessage.style.top = '125px';
-    filePath.innerText = downloadPath;
+    // filePath.innerText = downloadPath;
     nextButton.innerText = 'Exportar a excel';
     setTimeout(function() {
         successMessage.style.top = '-250px';
-    }, 5000);
+    }, 20000);
 }
 
 // Obtenemos la lista de items de cada tipo para mostrarlos en el resumen

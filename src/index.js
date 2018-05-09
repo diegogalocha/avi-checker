@@ -4,6 +4,9 @@
 import { app, BrowserWindow, ipcMain, ipcRenderer, dialog } from 'electron';
 import devtools from './devtools';
 import path from 'path';
+import { download } from 'electron-dl';
+
+// require('electron-dl')();
 
 if (process.env.NODE_ENV === 'development') {
     devtools();
@@ -20,7 +23,7 @@ app.on('ready', () => {
         icon: path.join(__dirname, 'assets', 'icon', 'main-icon.png')
     });
 
-     win.once('ready-to-show', () => {
+    win.once('ready-to-show', () => {
         win.show();
     });
 
@@ -32,17 +35,10 @@ app.on('ready', () => {
 
     win.maximize();
     win.loadURL(`file://${__dirname}/renderer/index.html`);
-    win.toggleDevTools();
-});
+    ipcMain.on("download", (event, info) => {
+        download(BrowserWindow.getFocusedWindow(), info.url, info.properties)
+            .then(dl => window.webContents.send("download complete", dl.getSavePath()));
+    });
 
-/*ipcMain.on('open-directory', function(event) {
-    debugger;
-    dialog.showOpenDialog(win, {
-        title: 'Seleccione ubicación',
-        buttonLabel: 'Abrir ubicación',
-        properties: ['openDirectory']
-    }, function(dir) {
-        debugger;
-        console.log(dir);
-    })
-});*/
+    // win.toggleDevTools();
+});
