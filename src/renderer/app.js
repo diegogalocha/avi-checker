@@ -1,17 +1,15 @@
 import XLSX from 'xlsx';
-import { ipcRenderer } from 'electron';
+import { ipcMain, ipcRenderer } from 'electron';
+const {app} = require('electron').remote;
+var userDataPath = app.getPath('downloads');
 
-ipcRenderer.on("download_complete", (event, file) => {
-    let successMessage = document.getElementById('download-message');
-    let filePath = document.getElementById('filepath');
-    let nextButton = document.getElementById('next');
-    successMessage.style.top = '125px';
-    filePath.innerText = file;
-    nextButton.innerText = 'Exportar a excel';
-    setTimeout(function() {
-        successMessage.style.top = '-250px';
-    }, 5000);
-});
+// import { setIpc, openDirectory, saveFile } from './ipcRendererEvents'
+
+/*function buttonEvent(id, func) {
+    debugger;
+    const openDirectory = document.getElementById(id);
+    openDirectory.addEventListener('click', func);
+}*/
 
 window.addEventListener('load', () => {
     // Inicializamos la página para llevar el control de dónde está el usuario
@@ -28,6 +26,8 @@ function initializeListeners () {
     let nextButton = document.getElementById('next');
     let xlfInput = document.getElementById('xlf');
 
+    // let openDirectory = document.getElementById('open-directory');
+
     previousButton.addEventListener('click', function () {
         goToPage(false);
     });
@@ -39,6 +39,11 @@ function initializeListeners () {
     xlfInput.addEventListener('change', function () {
         checkFileAndGetExpired(xlfInput.files[0]);
     });
+
+    /*openDirectory.addEventListener('click', function() {
+        debugger;
+        buttonEvent('open-directory', openDirectory);
+    });*/
 }
 
 // Función que chequea si el archivo seleccionado es válido para mostrar un error
@@ -426,12 +431,17 @@ function getInfo (id) {
 
 // Devuelve la fecha de caducidad de un producto como objeto Date
 function getDate (dateString) {
-    var parts = dateString.split('/');
-    var year = ((parts[2].length) < 4 ? '20' : '') + parts[2];
-    var month = parts[1] - 1;
-    var day = parts[0];
+    if (dateString) {
+        var parts = dateString.split('/');
+        var year = ((parts[2].length) < 4 ? '20' : '') + parts[2];
+        var month = parts[1] - 1;
+        var day = parts[0];
 
-    return new Date(year, month, day);
+        return new Date(year, month, day);
+    }
+
+    return new Date();
+
 }
 
 // Devuelve si la fecha de caducidad de un producto indica que está caducado
@@ -574,7 +584,7 @@ function exportToFile() {
     var notFoundSheet = XLSX.utils.json_to_sheet(notFound, {skipHeader: true});
 
     // Crear la archivo Excel nuevo
-		var wb = XLSX.utils.book_new();
+	var wb = XLSX.utils.book_new();
 
     // Añadir las hojas
     XLSX.utils.book_append_sheet(wb, itemsSheet, 'Productos');
@@ -585,9 +595,44 @@ function exportToFile() {
     XLSX.utils.book_append_sheet(wb, notFoundSheet, 'No encontrados');
 
     // Exportar a la carpeta exports dentro del programa
-    var filepath = '../export_' + Math.round(+new Date()/1000) + '.xlsx';
+    var filename = 'export_' + Math.round(+new Date()/1000) + '.xlsx';
+    var filepath = userDataPath + '/' + filename;
 
     XLSX.writeFile(wb, filepath, {compression:true});
+
+    var dirNameSplitted = __dirname.split('/');
+    var downloadPath;
+    if (dirNameSplitted.length === 1) {
+        downloadPath = 'La ruta de la aplicación con nombre ' + filename;
+    } else {
+        dirNameSplitted.splice(dirNameSplitted.length - 3, 3);
+        downloadPath = dirNameSplitted.join('/');
+        downloadPath = downloadPath + '/' + filename;
+    }
+
+    // ERROR C:\Users\ezzing1\AppData\Local\Programs\avi-checker\resources\export_1525869508.xlsx
+    // Ruta ubuntu: file:///home/diego-galocha/my-projects/avi-checker/src/renderer/../../../export_1525935612.xlsx
+    var urlToDownload = `file://${__dirname}/../../../../../${filename}`;
+    console.log(urlToDownload);
+    console.log(userDataPath);
+    /*ipcRenderer.send("download", {
+        url: urlToDownload,
+        properties: {directory: downloadPath, saveAs: true}
+    });*/
+    showExportedMessage(urlToDownload);
+}
+
+// Función que muestra un mensaje de éxito cuando la descarga se ha realizado
+function showExportedMessage(downloadPath) {
+    let successMessage = document.getElementById('download-message');
+    let filePath = document.getElementById('filepath');
+    let nextButton = document.getElementById('next');
+    successMessage.style.top = '125px';
+    // filePath.innerText = downloadPath;
+    nextButton.innerText = 'Exportar a excel';
+    setTimeout(function() {
+        successMessage.style.top = '-250px';
+    }, 20000);
 }
 
 // Obtenemos la lista de items de cada tipo para mostrarlos en el resumen
