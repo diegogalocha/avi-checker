@@ -386,46 +386,48 @@ function getInfo (id) {
         }
     }
 
+    var keyItemId;
     for (var key in notProcessedData) {
-      if (items[key].id === id) {
-        notProcessedData.splice(key, 1);
-        break;
-      }
+        keyItemId = notProcessedData[key].id;
+        if (keyItemId === id) {
+            notProcessedData.splice(key, 1);
+            break;
+        }
     }
 
     // Procesar localStorage internamente
-    if (processedIds.indexOf(id) == -1) {
-      processedIds.push(id);
-      localStorage.setItem('processed-ids', JSON.stringify(processedIds));
+    if (processedIds.indexOf(id) === -1) {
+        processedIds.push(id);
+        localStorage.setItem('processed-ids', JSON.stringify(processedIds));
 
-      var statusData = JSON.parse(localStorage.getItem(status));
+        var statusData = JSON.parse(localStorage.getItem(status));
 
-      if (matchedItem) {
-        statusData.push(matchedItem);
-      } else {
-        statusData.push({
-          'code' : '',
-          'name' : '',
-          'client_code' : '',
-          'client_name' : '',
-          'item_code' : '',
-          'item_description' : '',
-          'id' : id,
-          'delivery_number' : '',
-          'units' : '',
-          'sale_price' : '',
-          'delivery_date' : '',
-          'expiration_date' : ''
-        },);
-      }
+        if (matchedItem) {
+            statusData.push(matchedItem);
+        } else {
+            statusData.push({
+                'code': '',
+                'name': '',
+                'client_code': '',
+                'client_name': '',
+                'item_code': '',
+                'item_description': '',
+                'id': id,
+                'delivery_number': '',
+                'units': '',
+                'sale_price': '',
+                'delivery_date': '',
+                'expiration_date': ''
+            });
+        }
 
-      localStorage.setItem(status, JSON.stringify(statusData));
-      localStorage.setItem('not-processed', JSON.stringify(notProcessedData));
+        localStorage.setItem(status, JSON.stringify(statusData));
+        localStorage.setItem('not-processed', JSON.stringify(notProcessedData));
     }
 
     return {
-      'status': status,
-      'item': matchedItem
+        'status': status,
+        'item': matchedItem
     }
 }
 
