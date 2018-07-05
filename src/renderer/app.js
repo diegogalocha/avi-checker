@@ -1,7 +1,7 @@
 import XLSX from 'xlsx';
 import { ipcMain, ipcRenderer } from 'electron';
-// const {app} = require('electron').remote;
-// var userDataPath = app.getPath('downloads');
+const {app} = require('electron').remote;
+var userDataPath = app.getPath('downloads');
 
 // import { setIpc, openDirectory, saveFile } from './ipcRendererEvents'
 
@@ -386,46 +386,48 @@ function getInfo (id) {
         }
     }
 
+    var keyItemId;
     for (var key in notProcessedData) {
-      if (items[key].id === id) {
-        notProcessedData.splice(key, 1);
-        break;
-      }
+        keyItemId = notProcessedData[key].id;
+        if (keyItemId === id) {
+            notProcessedData.splice(key, 1);
+            break;
+        }
     }
 
     // Procesar localStorage internamente
-    if (processedIds.indexOf(id) == -1) {
-      processedIds.push(id);
-      localStorage.setItem('processed-ids', JSON.stringify(processedIds));
+    if (processedIds.indexOf(id) === -1) {
+        processedIds.push(id);
+        localStorage.setItem('processed-ids', JSON.stringify(processedIds));
 
-      var statusData = JSON.parse(localStorage.getItem(status));
+        var statusData = JSON.parse(localStorage.getItem(status));
 
-      if (matchedItem) {
-        statusData.push(matchedItem);
-      } else {
-        statusData.push({
-          'code' : '',
-          'name' : '',
-          'client_code' : '',
-          'client_name' : '',
-          'item_code' : '',
-          'item_description' : '',
-          'id' : id,
-          'delivery_number' : '',
-          'units' : '',
-          'sale_price' : '',
-          'delivery_date' : '',
-          'expiration_date' : ''
-        },);
-      }
+        if (matchedItem) {
+            statusData.push(matchedItem);
+        } else {
+            statusData.push({
+                'code': '',
+                'name': '',
+                'client_code': '',
+                'client_name': '',
+                'item_code': '',
+                'item_description': '',
+                'id': id,
+                'delivery_number': '',
+                'units': '',
+                'sale_price': '',
+                'delivery_date': '',
+                'expiration_date': ''
+            });
+        }
 
-      localStorage.setItem(status, JSON.stringify(statusData));
-      localStorage.setItem('not-processed', JSON.stringify(notProcessedData));
+        localStorage.setItem(status, JSON.stringify(statusData));
+        localStorage.setItem('not-processed', JSON.stringify(notProcessedData));
     }
 
     return {
-      'status': status,
-      'item': matchedItem
+        'status': status,
+        'item': matchedItem
     }
 }
 
@@ -584,7 +586,7 @@ function exportToFile() {
     var notFoundSheet = XLSX.utils.json_to_sheet(notFound, {skipHeader: true});
 
     // Crear la archivo Excel nuevo
-	var wb = XLSX.utils.book_new();
+    var wb = XLSX.utils.book_new();
 
     // Añadir las hojas
     XLSX.utils.book_append_sheet(wb, itemsSheet, 'Productos');
@@ -596,7 +598,7 @@ function exportToFile() {
 
     // Exportar a la carpeta exports dentro del programa
     var filename = 'export_' + Math.round(+new Date()/1000) + '.xlsx';
-    var filepath = '../' + filename;
+    var filepath = userDataPath + '/' + filename;
 
     XLSX.writeFile(wb, filepath, {compression:true});
 
@@ -610,13 +612,16 @@ function exportToFile() {
         downloadPath = downloadPath + '/' + filename;
     }
 
-    var urlToDownload = `file://${__dirname}/../../../${filename}`;
-    ipcRenderer.send("download", {
+    // ERROR C:\Users\ezzing1\AppData\Local\Programs\avi-checker\resources\export_1525869508.xlsx
+    // Ruta ubuntu: file:///home/diego-galocha/my-projects/avi-checker/src/renderer/../../../export_1525935612.xlsx
+    var urlToDownload = `file://${__dirname}/../../../../../${filename}`;
+    console.log(urlToDownload);
+    console.log(userDataPath);
+    /*ipcRenderer.send("download", {
         url: urlToDownload,
         properties: {directory: downloadPath, saveAs: true}
-    });
+    });*/
     showExportedMessage(urlToDownload);
-
 }
 
 // Función que muestra un mensaje de éxito cuando la descarga se ha realizado
