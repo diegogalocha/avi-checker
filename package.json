@@ -1,6 +1,6 @@
 {
   "name": "avi-checker",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Aplicación para revisión de stock en AVI",
   "main": "src/index.js",
   "scripts": {
@@ -27,7 +27,8 @@
   "devDependencies": {
     "devtron": "^1.4.0",
     "electron-forge": "^5.1.1",
-    "electron-prebuilt-compile": "1.8.3"
+    "electron-prebuilt-compile": "1.8.3",
+    "electron-builder": "^20.19.2"
   },
   "config": {
     "forge": {
