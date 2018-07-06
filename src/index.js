@@ -30,5 +30,5 @@ app.on('ready', () => {
 
     win.maximize();
     win.loadURL(`file://${__dirname}/renderer/index.html`);
-    win.toggleDevTools();
+    // win.toggleDevTools();
 });
