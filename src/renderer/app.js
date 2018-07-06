@@ -586,7 +586,7 @@ function exportToFile() {
     var notFoundSheet = XLSX.utils.json_to_sheet(notFound, {skipHeader: true});
 
     // Crear la archivo Excel nuevo
-	var wb = XLSX.utils.book_new();
+    var wb = XLSX.utils.book_new();
 
     // Añadir las hojas
     XLSX.utils.book_append_sheet(wb, itemsSheet, 'Productos');

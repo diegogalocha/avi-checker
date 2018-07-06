@@ -9,16 +9,18 @@ if (process.env.NODE_ENV === 'development') {
     devtools();
 }
 
+let win;
+
 // Ejecutando órdenes cuando la aplicación está lista
 app.on('ready', () => {
-    let win = new BrowserWindow({
+    win = new BrowserWindow({
         title: 'AVI Checker',
         center: true,
         show: false,
         icon: path.join(__dirname, 'assets', 'icon', 'main-icon.png')
     });
 
-     win.once('ready-to-show', () => {
+    win.once('ready-to-show', () => {
         win.show();
     });
 
