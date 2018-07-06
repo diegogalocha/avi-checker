@@ -1,12 +1,9 @@
 'use strict';
 
 // instanciando los objetos app y BrowserWindow
-import { app, BrowserWindow, ipcMain, ipcRenderer, dialog } from 'electron';
+import { app, BrowserWindow, ipcMain } from 'electron';
 import devtools from './devtools';
 import path from 'path';
-import { download } from 'electron-dl';
-
-// require('electron-dl')();
 
 if (process.env.NODE_ENV === 'development') {
     devtools();
@@ -35,10 +32,5 @@ app.on('ready', () => {
 
     win.maximize();
     win.loadURL(`file://${__dirname}/renderer/index.html`);
-    ipcMain.on("download", (event, info) => {
-        download(BrowserWindow.getFocusedWindow(), info.url, info.properties)
-            .then(dl => window.webContents.send("download complete", dl.getSavePath()));
-    });
-
     // win.toggleDevTools();
 });
