@@ -6,7 +6,6 @@ var userDataPath = app.getPath('downloads');
 // import { setIpc, openDirectory, saveFile } from './ipcRendererEvents'
 
 /*function buttonEvent(id, func) {
-    debugger;
     const openDirectory = document.getElementById(id);
     openDirectory.addEventListener('click', func);
 }*/
@@ -24,6 +23,7 @@ window.addEventListener('load', () => {
 function initializeListeners () {
     let previousButton = document.getElementById('previous');
     let nextButton = document.getElementById('next');
+    // Botón donde se clica para añadir el excel para analizar
     let xlfInput = document.getElementById('xlf');
 
     // let openDirectory = document.getElementById('open-directory');
@@ -41,7 +41,6 @@ function initializeListeners () {
     });
 
     /*openDirectory.addEventListener('click', function() {
-        debugger;
         buttonEvent('open-directory', openDirectory);
     });*/
 }
@@ -110,6 +109,7 @@ function goToPage (isNext) {
     	// Si el paso es a la página 3, tenemos que dar la funcionalidad al barCodeInput
         if (movement === 3) {
             addFunctionalityOfBarCodeInput();
+            // addForceSearchingButton();
         } else if (movement === 1) {
             document.getElementById('xlf').value = '';
             document.getElementById('file-name-span').innerText = '';
@@ -158,6 +158,13 @@ function addFunctionalityOfBarCodeInput () {
     }
 }
 
+/*function addForceSearchingButton() {
+    let forceSearching = document.getElementById('force-searching');
+    forceSearching.addEventListener('click', function () {
+        forceSearchValue();
+    });
+}*/
+
 // TODO Intentar meter el debounce en el lector
 var debounceInputListener = debounce(function () {
     // getBarCodeSelected(barCodeInput, event);
@@ -179,6 +186,12 @@ function debounce (func, wait, immediate) {
     }
 };
 
+/*function forceSearchValue() {
+    var barCodeInput = document.getElementById('bar-code');
+    var value = barCodeInput.value;
+    analyzeCode(barCodeInput, value);
+}*/
+
 // Función que añade los eventos necesarios al input recolector de códigos de barras.
 function getBarCodeSelected (barCodeInput, event) {
     var value = barCodeInput.value;
@@ -188,36 +201,7 @@ function getBarCodeSelected (barCodeInput, event) {
     var reg = new RegExp("^[A-Za-z0-9]{15}$");
     var hasMatched = value.match(reg);
     if (hasMatched) {
-        var item = getInfo(value);
-        var status = item.status;
-        let audio;
-
-        setProductInfo(item.item);
-
-        messageBox.className = 'message-box ' + status;
-        switch (status) {
-            case 'not-found':
-                messageBoxText.innerText = 'No encontrado';
-                break;
-            case 'about-to-expire':
-                messageBoxText.innerText = 'A punto de caducar';
-                audio = new Audio('../sounds/warning.mp3');
-                break;
-            case 'expired':
-                messageBoxText.innerText = 'Caducado';
-                audio = new Audio('../sounds/error.mp3');
-                break;
-            case 'correct':
-                messageBoxText.innerText = 'Correcto';
-                audio = new Audio('../sounds/correct.mp3');
-                break;
-        }
-
-        if (audio) {
-            audio.play();
-        }
-
-        barCodeInput.value = '';
+        analyzeCode(barCodeInput, value, messageBox, messageBoxText);
     } else if (value.length >= 15) {
         setProductInfo('');
         messageBox.className = 'message-box not-found';
@@ -227,6 +211,40 @@ function getBarCodeSelected (barCodeInput, event) {
         // TODO Avisar de que tiene que poner un código válido
     }
     // Hay que asegurarse que siempre tenga el focus
+}
+
+// Función que analiza el código captado por el input de código de barras
+function analyzeCode(barCodeInput, value, messageBox, messageBoxText) {
+    var item = getInfo(value);
+    var status = item.status;
+    let audio;
+
+    setProductInfo(item.item);
+
+    messageBox.className = 'message-box ' + status;
+    switch (status) {
+        case 'not-found':
+            messageBoxText.innerText = 'No encontrado';
+            break;
+        case 'about-to-expire':
+            messageBoxText.innerText = 'A punto de caducar';
+            audio = new Audio('../sounds/warning.mp3');
+            break;
+        case 'expired':
+            messageBoxText.innerText = 'Caducado';
+            audio = new Audio('../sounds/error.mp3');
+            break;
+        case 'correct':
+            messageBoxText.innerText = 'Correcto';
+            audio = new Audio('../sounds/correct.mp3');
+            break;
+    }
+
+    if (audio) {
+        audio.play();
+    }
+
+    barCodeInput.value = '';
 }
 
 // Función que añade la información del producto a mostrar
@@ -252,40 +270,28 @@ function loadXls (path) {
     errorElement.style.display = 'none';
 
     checkIfColumId(sheet);
-    var thereIsPrice = checkIfColumnPrice(sheet);
 
-    var defaultHeader = (thereIsPrice) ? [
-        'code',
-        'name',
+    var defaultHeader = [
         'client_code',
         'client_name',
-        'item_code',
-        'item_description',
-        'id',
-        'delivery_number',
-        'units',
-        'sale_price',
-        'delivery_date',
-        'expiration_date'
-    ] : [
         'code',
-        'name',
-        'client_code',
-        'client_name',
-        'item_code',
         'item_description',
-        'id',
-        'delivery_number',
         'units',
+        'id',
+        'expiration_date',
+        'delivery_number',
         'delivery_date',
-        'expiration_date'
+        'days'
     ];
 
-    var items = XLSX.utils.sheet_to_json(sheet, {header: defaultHeader, range: 1, blankrows: true});
+    var items = XLSX.utils.sheet_to_json(sheet, {header: defaultHeader, range: 0, blankrows: true});
 
-    items.shift();
+    // Después del cambio de tipo de archivos, no es necesario remover la primera fila en blanco
+    // items.shift();
     var header = items.shift();
-    var blankrow = items.shift();
+
+    // Después del cambio de tipo de archivos, no es necesario remover la tercera fila en blanco
+    // var blankrow = items.shift();
 
     if (!isValid(header)) {
         return {
@@ -304,7 +310,7 @@ function loadXls (path) {
     localStorage.setItem('not-processed', JSON.stringify(items));
     localStorage.setItem('items', JSON.stringify(items));
     localStorage.setItem('header', JSON.stringify(header));
-    localStorage.setItem('blankrow', JSON.stringify(blankrow));
+    // localStorage.setItem('blankrow', JSON.stringify(blankrow));
 
     return {
         success: true,
@@ -326,7 +332,7 @@ function checkIfColumId(sheet) {
     for (var item of keys) {
         letter = item.charAt(0);
         column = sheet[item];
-        if (column.v === 'Nº Lote') {
+        if (column.v === 'serielot') {
             idColumnLetter = letter;
             break;
         }
@@ -341,21 +347,6 @@ function checkIfColumId(sheet) {
             column.w = column.v;
         }
     }
-}
-
-function checkIfColumnPrice(sheet) {
-    var keys = Object.keys(sheet);
-    let letter;
-    let column;
-
-    for (var item of keys) {
-        letter = item.charAt(0);
-        column = sheet[item];
-        if (column.v === 'Precio Venta') {
-            return true;
-        }
-    }
-    return false
 }
 
 // Devuelve el estado de un producto dado su id
@@ -407,17 +398,15 @@ function getInfo (id) {
         } else {
             statusData.push({
                 'code': '',
-                'name': '',
                 'client_code': '',
                 'client_name': '',
-                'item_code': '',
                 'item_description': '',
                 'id': id,
                 'delivery_number': '',
                 'units': '',
-                'sale_price': '',
                 'delivery_date': '',
-                'expiration_date': ''
+                'expiration_date': '',
+                'days': ''
             });
         }
 
@@ -503,17 +492,16 @@ function getAboutToExpire (items) {
 // Devuelve si el contenido del Excel es válido según sus cabeceras
 function isValid (header) {
     return (
-        (header['client_code'] === 'Cód. Cliente') &&
-        (header['client_name'] === 'Nombre Cliente') &&
-        (header['code'] === 'Código') &&
-        (header['delivery_date'] === 'Fecha Albarán') &&
-        (header['delivery_number'] === 'Nº Albarán') &&
-        (header['expiration_date'] === 'Fecha Caducidad') &&
-        (header['id'] === 'Nº Lote') &&
-        (header['item_code'] === 'Cód. Artículo') &&
-        (header['item_description'] === 'Descripción Artículo') &&
-        (header['name'] === 'Nombre') &&
-        (header['units'] === 'Unidades')
+        (header['client_code'] === 'cliente') &&
+        (header['client_name'] === 'nombre') &&
+        (header['code'] === 'raiz') &&
+        (header['delivery_date'] === 'fecha') &&
+        (header['delivery_number'] === 'numero') &&
+        (header['expiration_date'] === 'caducidad') &&
+        (header['id'] === 'serielot') &&
+        (header['item_description'] === 'descripcio') &&
+        (header['units'] === 'canti_l') &&
+        (header['days'] === 'dias')
       );
 }
 
@@ -527,7 +515,6 @@ function exportToFile() {
     var notProcessed = JSON.parse(localStorage.getItem('not-processed'));
     var notFound = JSON.parse(localStorage.getItem('not-found'));
     var header = JSON.parse(localStorage.getItem('header'));
-    var blankrow = JSON.parse(localStorage.getItem('blankrow'));
 
     // Exportar solo los no caducados en la hoja principal
     var itemsToExport = [];
@@ -541,40 +528,27 @@ function exportToFile() {
 
     // Añadir cabeceras del Excel original
     itemsToExport.unshift(
-      blankrow,
-      blankrow,
-      header,
-      blankrow
+      header
     );
 
     expired.unshift(
-      blankrow,
-      header,
-      blankrow
+      header
     );
 
     aboutToExpire.unshift(
-      blankrow,
-      header,
-      blankrow
+      header
     );
 
     correct.unshift(
-      blankrow,
-      header,
-      blankrow
+      header
     );
 
     notProcessed.unshift(
-      blankrow,
-      header,
-      blankrow
+      header
     );
 
     notFound.unshift(
-      blankrow,
-      header,
-      blankrow
+      header
     );
 
     // Convertir arrays de JSON de items en hojas de Excel
