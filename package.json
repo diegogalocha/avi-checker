@@ -17,20 +17,20 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "cross-env": "^5.1.4",
-    "electron-compile": "^6.4.2",
-    "electron-debug": "^1.5.0",
-    "electron-dl": "^1.12.0",
+    "cross-env": "^6.0.3",
+    "electron-compile": "^6.4.4",
+    "electron-debug": "^3.0.1",
+    "electron-dl": "^1.14.0",
     "electron-squirrel-startup": "^1.0.0",
-    "standard": "^11.0.0",
+    "standard": "^14.3.1",
     "xlsx": "^0.12.5"
   },
   "devDependencies": {
     "devtron": "^1.4.0",
-    "electron-forge": "^5.1.1",
-    "electron-prebuilt-compile": "1.8.3",
-    "electron-winstaller": "^2.6.4",
-    "electron-builder": "^20.19.2"
+    "electron-forge": "^5.2.4",
+    "electron-prebuilt-compile": "4.0.0",
+    "electron-winstaller": "^4.0.0",
+    "electron-builder": "^21.2.0"
   },
   "build": {
     "appId": "avi-checker",

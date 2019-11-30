@@ -1,14 +1,6 @@
 import XLSX from 'xlsx';
-import { ipcMain, ipcRenderer } from 'electron';
 const {app} = require('electron').remote;
 var userDataPath = app.getPath('downloads');
-
-// import { setIpc, openDirectory, saveFile } from './ipcRendererEvents'
-
-/*function buttonEvent(id, func) {
-    const openDirectory = document.getElementById(id);
-    openDirectory.addEventListener('click', func);
-}*/
 
 window.addEventListener('load', () => {
     // Inicializamos la página para llevar el control de dónde está el usuario
@@ -17,7 +9,7 @@ window.addEventListener('load', () => {
     // Añadimos los listener a los botones de Atrás y Siguiente, y al input file
     initializeListeners();
     checkIfShowPreviousOrNextButton(1);
-})
+});
 
 // Función que inicializa los listeners necesarios
 function initializeListeners () {
@@ -39,10 +31,6 @@ function initializeListeners () {
     xlfInput.addEventListener('change', function () {
         checkFileAndGetExpired(xlfInput.files[0]);
     });
-
-    /*openDirectory.addEventListener('click', function() {
-        buttonEvent('open-directory', openDirectory);
-    });*/
 }
 
 // Función que chequea si el archivo seleccionado es válido para mostrar un error

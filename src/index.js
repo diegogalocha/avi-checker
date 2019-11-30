@@ -1,7 +1,6 @@
 'use strict';
 
-// instanciando los objetos app y BrowserWindow
-import { app, BrowserWindow, ipcMain } from 'electron';
+import { app, BrowserWindow } from 'electron';
 import devtools from './devtools';
 import path from 'path';
 

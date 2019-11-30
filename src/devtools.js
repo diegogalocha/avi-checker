@@ -1,7 +1,7 @@
-import { enableLiveReload } from 'electron-compile'
-import electronDebug from 'electron-debug'
+import { enableLiveReload } from 'electron-compile';
+const electronDebug = require('electron-debug');
 
 module.exports = function devtools () {
-  	// enableLiveReload();
-  	// electronDebug({ showDevTools: true });
-}
+  	enableLiveReload();
+  	electronDebug({ showDevTools: true });
+};
