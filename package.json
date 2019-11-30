@@ -1,77 +1,77 @@
 {
-  "name": "avi-checker",
-  "version": "1.2.0",
-  "description": "Aplicación para revisión de stock en AVI",
-  "main": "src/index.js",
-  "scripts": {
-    "dev": "cross-env NODE_ENV=development electron src/index.js",
-    "lint": "standard",
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "electron-forge start",
-    "package-mac": "electron-forge package --platform=darwin --arch=x64",
-    "package-win": "electron-forge package --platform=win32 --arch=ia32",
-    "package-linux": "electron-forge package --platform=linux --arch=x64",
-    "make": "electron-forge make",
-    "dist": "electron-builder"
-  },
-  "author": "",
-  "license": "ISC",
-  "dependencies": {
-    "cross-env": "^6.0.3",
-    "electron-compile": "^6.4.4",
-    "electron-debug": "^3.0.1",
-    "electron-dl": "^1.14.0",
-    "electron-squirrel-startup": "^1.0.0",
-    "standard": "^14.3.1",
-    "xlsx": "^0.12.5"
-  },
-  "devDependencies": {
-    "devtron": "^1.4.0",
-    "electron-forge": "^5.2.4",
-    "electron-prebuilt-compile": "4.0.0",
-    "electron-winstaller": "^4.0.0",
-    "electron-builder": "^21.2.0"
-  },
-  "build": {
-    "appId": "avi-checker",
-    "productName": "AVI Checker",
-    "win": {
-      "target": "nsis",
-      "icon": "src/assets/icons/main-icon.ico"
+    "name": "avi-checker",
+    "version": "1.2.0",
+    "description": "Aplicación para revisión de stock en AVI",
+    "main": "src/index.js",
+    "scripts": {
+        "dev": "cross-env NODE_ENV=development electron src/index.js",
+        "lint": "standard",
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "start": "electron-forge start",
+        "package-mac": "electron-forge package --platform=darwin --arch=x64",
+        "package-win": "electron-forge package --platform=win32 --arch=ia32",
+        "package-linux": "electron-forge package --platform=linux --arch=x64",
+        "make": "electron-forge make",
+        "dist": "electron-builder"
+    },
+    "author": "",
+    "license": "ISC",
+    "dependencies": {
+        "cross-env": "^6.0.3",
+        "electron-compile": "^6.4.4",
+        "electron-debug": "^3.0.1",
+        "electron-dl": "^1.14.0",
+        "electron-squirrel-startup": "^1.0.0",
+        "standard": "^14.3.1",
+        "xlsx": "^0.12.5"
+    },
+    "devDependencies": {
+        "devtron": "^1.4.0",
+        "electron-forge": "^5.2.4",
+        "electron-prebuilt-compile": "4.0.0",
+        "electron-winstaller": "^4.0.0",
+        "electron-builder": "^21.2.0"
+    },
+    "build": {
+        "appId": "avi-checker",
+        "productName": "AVI Checker",
+        "win": {
+            "target": "nsis",
+            "icon": "src/assets/icons/main-icon.ico"
+        }
+    },
+    "config": {
+        "forge": {
+            "make_targets": {
+                "win32": [
+                    "squirrel"
+                ],
+                "darwin": [
+                    "zip"
+                ],
+                "linux": [
+                    "deb",
+                    "rpm"
+                ]
+            },
+            "electronPackagerConfig": {
+                "asar": true,
+                "packageManager": "npm",
+                "icon": "src/assets/icons/main-icon"
+            },
+            "electronWinstallerConfig": {
+                "name": "avi-checker"
+            },
+            "electronInstallerDebian": {},
+            "electronInstallerRedhat": {},
+            "github_repository": {
+                "owner": "",
+                "name": ""
+            },
+            "windowsStoreConfig": {
+                "packageName": "",
+                "name": "avi-checker"
+            }
+        }
     }
-  },
-  "config": {
-    "forge": {
-      "make_targets": {
-        "win32": [
-          "squirrel"
-        ],
-        "darwin": [
-          "zip"
-        ],
-        "linux": [
-          "deb",
-          "rpm"
-        ]
-      },
-      "electronPackagerConfig": {
-        "asar": true,
-        "packageManager": "npm",
-        "icon": "src/assets/icons/main-icon"
-      },
-      "electronWinstallerConfig": {
-        "name": "avi-checker"
-      },
-      "electronInstallerDebian": {},
-      "electronInstallerRedhat": {},
-      "github_repository": {
-        "owner": "",
-        "name": ""
-      },
-      "windowsStoreConfig": {
-        "packageName": "",
-        "name": "avi-checker"
-      }
-    }
-  }
 }
