@@ -26,11 +26,16 @@
         "xlsx": "^0.12.5"
     },
     "devDependencies": {
+        "clean-css": ">=4.1.11",
+        "constantinople": ">=3.1.1",
+        "cryptiles": ">=4.1.2",
         "devtron": "^1.4.0",
         "electron-forge": "^5.2.4",
         "electron-prebuilt-compile": "4.0.0",
         "electron-winstaller": "^4.0.0",
-        "electron-builder": "^21.2.0"
+        "electron-builder": "^21.2.0",
+        "hoek": ">=4.2.1",
+        "mem": ">=4.0.0"
     },
     "build": {
         "appId": "avi-checker",
