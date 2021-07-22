@@ -23,7 +23,7 @@
         "electron-dl": "^3.0.2",
         "electron-squirrel-startup": "^1.0.0",
         "standard": "^16.0.1",
-        "xlsx": "^0.16.8"
+        "xlsx": "^0.17.0"
     },
     "devDependencies": {
         "clean-css": ">=4.2.3",
