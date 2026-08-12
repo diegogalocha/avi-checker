@@ -1,12 +1,8 @@
 'use strict';
 
-import { app, BrowserWindow } from 'electron';
-import devtools from './devtools';
-import path from 'path';
-
-if (process.env.NODE_ENV === 'development') {
-    devtools();
-}
+const { app, BrowserWindow } = require('electron');
+const path = require('path');
+require('@electron/remote/main').initialize();
 
 let win;
 
@@ -16,20 +12,25 @@ app.on('ready', () => {
         title: 'AVI Checker',
         center: true,
         show: false,
-        icon: path.join(__dirname, 'assets', 'icon', 'main-icon.png')
+        icon: path.join(__dirname, 'assets', 'icons', 'main-icon.png'),
+        webPreferences: {
+            nodeIntegration: true,
+            contextIsolation: false,
+            enableRemoteModule: true
+        }
     });
+
+    require('@electron/remote/main').enable(win.webContents);
 
     win.once('ready-to-show', () => {
         win.show();
     });
 
     // detectando el cierre de la ventana para cerrar la aplicación
-    win.on('close', () => {
+    win.on('closed', () => {
         win = null;
-        app.quit();
     });
 
     win.maximize();
     win.loadURL(`file://${__dirname}/renderer/index.html`);
-    // win.toggleDevTools();
 });

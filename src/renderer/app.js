@@ -1,5 +1,6 @@
-import XLSX from 'xlsx';
-const {app} = require('electron').remote;
+const path = require('path');
+const XLSX = require('xlsx');
+const {app} = require('@electron/remote');
 var userDataPath = app.getPath('downloads');
 
 window.addEventListener('load', () => {
@@ -558,32 +559,14 @@ function exportToFile() {
     XLSX.utils.book_append_sheet(wb, notProcessedSheet, 'No procesados');
     XLSX.utils.book_append_sheet(wb, notFoundSheet, 'No encontrados');
 
-    // Exportar a la carpeta exports dentro del programa
+    // Exportar a la carpeta de descargas del usuario
     var filename = 'export_' + Math.round(+new Date()/1000) + '.xlsx';
-    var filepath = userDataPath + '/' + filename;
+    var filepath = path.join(userDataPath, filename);
 
-    XLSX.writeFile(wb, filepath, {compression:true});
+    XLSX.writeFile(wb, filepath, {compression: true});
 
-    var dirNameSplitted = __dirname.split('/');
-    var downloadPath;
-    if (dirNameSplitted.length === 1) {
-        downloadPath = 'La ruta de la aplicación con nombre ' + filename;
-    } else {
-        dirNameSplitted.splice(dirNameSplitted.length - 3, 3);
-        downloadPath = dirNameSplitted.join('/');
-        downloadPath = downloadPath + '/' + filename;
-    }
-
-    // ERROR C:\Users\ezzing1\AppData\Local\Programs\avi-checker\resources\export_1525869508.xlsx
-    // Ruta ubuntu: file:///home/diego-galocha/my-projects/avi-checker/src/renderer/../../../export_1525935612.xlsx
-    var urlToDownload = `file://${__dirname}/../../../../../${filename}`;
-    console.log(urlToDownload);
-    console.log(userDataPath);
-    /*ipcRenderer.send("download", {
-        url: urlToDownload,
-        properties: {directory: downloadPath, saveAs: true}
-    });*/
-    showExportedMessage(urlToDownload);
+    console.log('Exportado en:', filepath);
+    showExportedMessage(filepath);
 }
 
 // Función que muestra un mensaje de éxito cuando la descarga se ha realizado
