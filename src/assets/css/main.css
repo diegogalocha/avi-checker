@@ -1,5 +1,5 @@
 body {
-    background-color: #b5007c;
+    background-color: #0070b9;
     background-image: url(../images/advanced-vision-iberia.png);
     background-repeat: no-repeat;
     font-size: 16px;
@@ -76,7 +76,8 @@ input {
     margin: 0 auto;
     align-items: center;
     height: 100%;
-    background-color: rgba(255, 255, 255, 0.4);
+    background-color: rgba(174, 206, 226, 0.85);
+    color: #003366;
 }
 
 .window-content #page1 {
@@ -113,14 +114,14 @@ input {
 .window-content .select-input .xls-input-container .custom-file-upload {
     display: flex;
     align-items: center;
-    border: 1px solid #b5007c;
+    border: 1px solid #0070b9;
     padding: 6px 12px;
     cursor: pointer;
     box-shadow: 1px 1px 10px -3px rgba(0, 0, 0, 0.75);
 }
 
 .window-content .select-input .xls-input-container .custom-file-upload:hover {
-    background-color: #b5007c;
+    background-color: #0070b9;
 }
 
 .window-content .select-input .xls-input-container .custom-file-upload img {
@@ -222,8 +223,8 @@ input {
 }
 
 .window-content .bar-code-selector .bar-input input:focus{
-    outline-color: #b5007c;
-    border: 2px solid #b5007c;
+    outline-color: #0070b9;
+    border: 2px solid #0070b9;
 }
 
 .window-content .bar-code-selector .message-box-container {
@@ -233,7 +234,7 @@ input {
 }
 
 .window-content .bar-code-selector .message-box-container .message-box {
-    background-color: #b5007c;
+    background-color: #0070b9;
     width: 85%;
     height: 50%;
     text-align: center;
@@ -349,7 +350,7 @@ footer {
 }
 
 footer.toolbar {
-    background-image: linear-gradient(to bottom,#e8e6e8 0,#fdd0d8 100%);
+    background-image: linear-gradient(to bottom,#e8e6e8 0,rgb(174, 206, 226) 100%);
 }
 
 footer .toolbar-actions button {
@@ -359,12 +360,12 @@ footer .toolbar-actions button {
 }
 
 footer .toolbar-actions button.btn-primary {
-    border-color: #d366b1 #b5007c #b5007c;
-    background-image: linear-gradient(to bottom,#d366b1 0,#d366b1 100%);
+    border-color: #005fa0 #0070b9 #0070b9;
+    background-image: linear-gradient(to bottom,#0070b9 0,#0070b9 100%);
 }
 
 footer .toolbar-actions button.btn-primary:hover{
-    background-image: linear-gradient(to bottom,#f579ce 0,#b5007c 100%);
+    background-image: linear-gradient(to bottom,#3b9bd8 0,#0070b9 100%);
 }
 
 footer .toolbar-actions button.btn-default {

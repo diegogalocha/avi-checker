@@ -1,7 +1,7 @@
 const path = require('path');
 const XLSX = require('xlsx');
 const {app} = require('@electron/remote');
-var userDataPath = app.getPath('downloads');
+const userDataPath = app.getPath('downloads');
 
 window.addEventListener('load', () => {
     // Inicializamos la página para llevar el control de dónde está el usuario
@@ -14,12 +14,9 @@ window.addEventListener('load', () => {
 
 // Función que inicializa los listeners necesarios
 function initializeListeners () {
-    let previousButton = document.getElementById('previous');
-    let nextButton = document.getElementById('next');
-    // Botón donde se clica para añadir el excel para analizar
-    let xlfInput = document.getElementById('xlf');
-
-    // let openDirectory = document.getElementById('open-directory');
+    const previousButton = document.getElementById('previous');
+    const nextButton = document.getElementById('next');
+    const xlfInput = document.getElementById('xlf');
 
     previousButton.addEventListener('click', function () {
         goToPage(false);
@@ -29,30 +26,28 @@ function initializeListeners () {
         goToPage(true);
     });
 
-    xlfInput.addEventListener('change', function () {
-        checkFileAndGetExpired(xlfInput.files[0]);
+    xlfInput.addEventListener('change', async function () {
+        await checkFileAndGetExpired(xlfInput.files[0]);
     });
 }
 
 // Función que chequea si el archivo seleccionado es válido para mostrar un error
 // o seguir adelante
-function checkFileAndGetExpired (file) {
-    var errorElement = document.getElementById('format-error');
-    if (file.type) {
-        setFileName(file.name);
-        let response = loadXls(file.path);
-        if (response.success) {
-            errorElement.style.display = 'none';
-            goToPage(true);
-            setResumeValues(response.items, response.expiredItems, response.aboutToExpireItems);
-        } else {
-            errorElement.style.display = 'block';
-            document.getElementById('span-input-file').innerText = 'Seleccione un archivo válido';
-            // TODO intentar poner un archivo de ejemplo para descargar
-        }
-        // Expired me devuelve la lista de expirados
+async function checkFileAndGetExpired (file) {
+    const errorElement = document.getElementById('format-error');
+    if (!file || !file.type) {
+        errorElement.style.display = 'block';
+        return;
+    }
+    setFileName(file.name);
+    const response = await loadXls(file);
+    if (response.success) {
+        errorElement.style.display = 'none';
+        goToPage(true);
+        setResumeValues(response.items, response.expiredItems, response.aboutToExpireItems);
     } else {
         errorElement.style.display = 'block';
+        document.getElementById('span-input-file').innerText = 'Seleccione un archivo válido';
     }
 }
 
@@ -64,9 +59,9 @@ function setFileName(name) {
 
 // Función que inyecta los valores para el resumen de la segunda página
 function setResumeValues (items, expiredItems, aboutToExpireItems) {
-    let numberOfProducts = document.getElementById('numero-productos');
-    let numberOfExpired = document.getElementById('numero-caducados');
-    let numberOfAboutToExpire = document.getElementById('numero-apunto-caducar');
+    const numberOfProducts = document.getElementById('numero-productos');
+    const numberOfExpired = document.getElementById('numero-caducados');
+    const numberOfAboutToExpire = document.getElementById('numero-apunto-caducar');
     numberOfProducts.innerText = 'Se han cargado ' + items.length + ' productos del archivo.';
     numberOfExpired.innerText = 'Tiene ' + expiredItems.length + ' productos caducados.';
     numberOfAboutToExpire.innerText = 'Tiene ' + aboutToExpireItems.length + ' productos a punto de caducar.';
@@ -76,45 +71,45 @@ function setResumeValues (items, expiredItems, aboutToExpireItems) {
 // para indicar si el usuario va hacia delante o hacia atrás. Si el movimiento de página
 // es a la 5, queremos exportar el archivo y olvidar el ir a la siguiente página
 function goToPage (isNext) {
-    var pageNumber = parseInt(localStorage.getItem('page'), 10);
-    var movement = isNext ? pageNumber + 1 : pageNumber - 1;
+    const pageNumber = parseInt(localStorage.getItem('page'), 10) || 1;
+    const movement = isNext ? pageNumber + 1 : pageNumber - 1;
     if (movement === 5) {
         exportToFile();
-    } else {
-    	var idToHide = 'page' + pageNumber;
-    	var idToShow = 'page' + movement;
-    	var pageToHide = document.getElementById(idToHide);
-    	var pageToShow = document.getElementById(idToShow);
+        return;
+    }
+    const idToHide = `page${pageNumber}`;
+    const idToShow = `page${movement}`;
+    const pageToHide = document.getElementById(idToHide);
+    const pageToShow = document.getElementById(idToShow);
 
-    	if (pageToHide) {
-    		pageToHide.classList.add('hidden');
-    	}
-    	if (pageToShow) {
-    		pageToShow.classList.remove('hidden');
-    	}
+    if (pageToHide) {
+        pageToHide.classList.add('hidden');
+    }
+    if (pageToShow) {
+        pageToShow.classList.remove('hidden');
+    }
 
-    	localStorage.setItem('page', movement);
+    localStorage.setItem('page', movement);
 
     	// Si el paso es a la página 3, tenemos que dar la funcionalidad al barCodeInput
-        if (movement === 3) {
-            addFunctionalityOfBarCodeInput();
-            // addForceSearchingButton();
-        } else if (movement === 1) {
-            document.getElementById('xlf').value = '';
-            document.getElementById('file-name-span').innerText = '';
-            document.getElementById('span-input-file').innerText = 'Seleccione un archivo';
-        } else if (movement === 4) {
-            getListsOfItems();
-        }
-
-        checkIfShowPreviousOrNextButton(movement);
+    if (movement === 3) {
+        addFunctionalityOfBarCodeInput();
+        // addForceSearchingButton();
+    } else if (movement === 1) {
+        document.getElementById('xlf').value = '';
+        document.getElementById('file-name-span').innerText = '';
+        document.getElementById('span-input-file').innerText = 'Seleccione un archivo';
+    } else if (movement === 4) {
+        getListsOfItems();
     }
+
+    checkIfShowPreviousOrNextButton(movement);
 }
 
 // Función que decide si mostrar o no los botones de atrás o siguiente
 function checkIfShowPreviousOrNextButton (page) {
-    let previousButton = document.getElementById('previous');
-    let nextButton = document.getElementById('next');
+    const previousButton = document.getElementById('previous');
+    const nextButton = document.getElementById('next');
     if (page === 1) {
         previousButton.style.display = 'none';
         nextButton.style.display = 'none';
@@ -134,12 +129,12 @@ function checkIfShowPreviousOrNextButton (page) {
 
 // Añadimos la funcionalidad necesaria al input lector de bar code
 function addFunctionalityOfBarCodeInput () {
-    var barCodeInput = document.getElementById('bar-code');
+    const barCodeInput = document.getElementById('bar-code');
     barCodeInput.focus();
-    var isListenerAdded = parseInt(localStorage.getItem('barCodeInputListenerAdded'), 10);
+    const isListenerAdded = parseInt(localStorage.getItem('barCodeInputListenerAdded'), 10);
     if (!isListenerAdded) {
         barCodeInput.addEventListener('keyup', function (event) {
-            if (event.keyCode !== 17) {
+            if (event.key !== 'Control') {
                 getBarCodeSelected(barCodeInput, event);
             }
         });
@@ -147,90 +142,45 @@ function addFunctionalityOfBarCodeInput () {
     }
 }
 
-/*function addForceSearchingButton() {
-    let forceSearching = document.getElementById('force-searching');
-    forceSearching.addEventListener('click', function () {
-        forceSearchValue();
-    });
-}*/
-
-// TODO Intentar meter el debounce en el lector
-var debounceInputListener = debounce(function () {
-    // getBarCodeSelected(barCodeInput, event);
-}, 1000, false);
-
-// Debounce function extraída de google
-function debounce (func, wait, immediate) {
-    var timeout;
-    return function () {
-        var context = this, args = arguments;
-        var later = function () {
-            timeout = null;
-            if (!immediate) func.apply(context, args);
-        }
-        var callNow = immediate && !timeout;
-        clearTimeout(timeout);
-        timeout = setTimeout(later, wait);
-        if (callNow) func.apply(context, args);
-    }
-};
-
-/*function forceSearchValue() {
-    var barCodeInput = document.getElementById('bar-code');
-    var value = barCodeInput.value;
-    analyzeCode(barCodeInput, value);
-}*/
-
 // Función que añade los eventos necesarios al input recolector de códigos de barras.
 function getBarCodeSelected (barCodeInput, event) {
-    var value = barCodeInput.value;
-    var messageBox = document.getElementById('message-box');
-    var messageBoxText = document.getElementById('message-box-text');
+    const value = barCodeInput.value;
+    const messageBox = document.getElementById('message-box');
+    const messageBoxText = document.getElementById('message-box-text');
+    const isValidCode = /^[A-Za-z0-9]{15}$/.test(value);
 
-    var reg = new RegExp("^[A-Za-z0-9]{15}$");
-    var hasMatched = value.match(reg);
-    if (hasMatched) {
+    if (isValidCode) {
         analyzeCode(barCodeInput, value, messageBox, messageBoxText);
     } else if (value.length >= 15) {
         setProductInfo('');
         messageBox.className = 'message-box not-found';
         messageBoxText.innerText = 'No encontrado';
         barCodeInput.value = '';
-    } else {
-        // TODO Avisar de que tiene que poner un código válido
     }
-    // Hay que asegurarse que siempre tenga el focus
+    barCodeInput.focus();
 }
 
 // Función que analiza el código captado por el input de código de barras
 function analyzeCode(barCodeInput, value, messageBox, messageBoxText) {
-    var item = getInfo(value);
-    var status = item.status;
-    let audio;
+    const {status, item} = getInfo(value);
+    const messages = {
+        'not-found': 'No encontrado',
+        'about-to-expire': 'A punto de caducar',
+        'expired': 'Caducado',
+        'correct': 'Correcto'
+    };
+    const sounds = {
+        'about-to-expire': '../sounds/warning.mp3',
+        'expired': '../sounds/error.mp3',
+        'correct': '../sounds/correct.mp3'
+    };
 
-    setProductInfo(item.item);
-
+    setProductInfo(item);
     messageBox.className = 'message-box ' + status;
-    switch (status) {
-        case 'not-found':
-            messageBoxText.innerText = 'No encontrado';
-            break;
-        case 'about-to-expire':
-            messageBoxText.innerText = 'A punto de caducar';
-            audio = new Audio('../sounds/warning.mp3');
-            break;
-        case 'expired':
-            messageBoxText.innerText = 'Caducado';
-            audio = new Audio('../sounds/error.mp3');
-            break;
-        case 'correct':
-            messageBoxText.innerText = 'Correcto';
-            audio = new Audio('../sounds/correct.mp3');
-            break;
-    }
+    messageBoxText.innerText = messages[status] || '';
 
-    if (audio) {
-        audio.play();
+    if (sounds[status]) {
+        new Audio(sounds[status]).play();
     }
 
     barCodeInput.value = '';
@@ -251,16 +201,21 @@ function setProductInfo (item) {
 }
 
 // Carga el excel en localStorage y devuelve la lista de productos caducados
-function loadXls (path) {
-    var file = XLSX.readFile(path, {dateNF: 'd/m/yy'});
-    var sheet = file.Sheets[file.SheetNames[0]];
-    // Ocultamos el error que sale en la segunda página cada vez que carguemos un archivo nuevo
-    var errorElement = document.getElementById('format-error-dates');
+async function loadXls (file) {
+    let workbook;
+    if (file.path) {
+        workbook = XLSX.readFile(file.path, {cellDates: true});
+    } else {
+        const arrayBuffer = await file.arrayBuffer();
+        workbook = XLSX.read(arrayBuffer, {type: 'array', cellDates: true});
+    }
+    const sheet = workbook.Sheets[workbook.SheetNames[0]];
+    const errorElement = document.getElementById('format-error-dates');
     errorElement.style.display = 'none';
 
     checkIfColumId(sheet);
 
-    var defaultHeader = [
+    const defaultHeader = [
         'client_code',
         'client_name',
         'code',
@@ -273,14 +228,8 @@ function loadXls (path) {
         'days'
     ];
 
-    var items = XLSX.utils.sheet_to_json(sheet, {header: defaultHeader, range: 0, blankrows: true});
-
-    // Después del cambio de tipo de archivos, no es necesario remover la primera fila en blanco
-    // items.shift();
-    var header = items.shift();
-
-    // Después del cambio de tipo de archivos, no es necesario remover la tercera fila en blanco
-    // var blankrow = items.shift();
+    const items = XLSX.utils.sheet_to_json(sheet, {header: defaultHeader, range: 0, blankrows: true, raw: true});
+    const header = items.shift();
 
     if (!isValid(header)) {
         return {
@@ -288,8 +237,8 @@ function loadXls (path) {
         }
     }
 
-    var expired = getExpired(items);
-    var aboutToExpire = getAboutToExpire(items);
+    const expired = getExpired(items);
+    const aboutToExpire = getAboutToExpire(items);
 
     localStorage.setItem('processed-ids', JSON.stringify([]));
     localStorage.setItem('expired', JSON.stringify([]));
@@ -299,7 +248,6 @@ function loadXls (path) {
     localStorage.setItem('not-processed', JSON.stringify(items));
     localStorage.setItem('items', JSON.stringify(items));
     localStorage.setItem('header', JSON.stringify(header));
-    // localStorage.setItem('blankrow', JSON.stringify(blankrow));
 
     return {
         success: true,
@@ -309,93 +257,77 @@ function loadXls (path) {
     }
 }
 
-// Comprobamos aquí que la columna que tiene los ids se parsee como string para
-// evitar la transformación que hace EXCEL sobre los números largos
+// Comprobamos que la columna de ids se parsee como string para evitar
+// la transformación que hace Excel sobre los números largos
 function checkIfColumId(sheet) {
-    var keys = Object.keys(sheet);
-    let letter;
+    const keys = Object.keys(sheet);
     let idColumnLetter;
-    let column;
 
-    // Este primer for es para obtener la letra del nº de lote
-    for (var item of keys) {
-        letter = item.charAt(0);
-        column = sheet[item];
-        if (column.v === 'serielot') {
-            idColumnLetter = letter;
+    // Buscamos la celda que contiene el encabezado 'serielot'
+    for (const key of keys) {
+        if (sheet[key].v === 'serielot') {
+            idColumnLetter = key.charAt(0);
             break;
         }
     }
 
-    // Transformamos los ids del número de lote en strings
-    for(var item of keys) {
-        column = sheet[item];
-        var isIdColumn = item.includes(letter);
-        if (isIdColumn && column.t === 'n') {
-            column.v = column.v.toString();
-            column.w = column.v;
+    if (!idColumnLetter) {
+        return;
+    }
+
+    // Convertimos los ids de esa columna a string
+    for (const key of keys) {
+        if (key.startsWith(idColumnLetter) && sheet[key].t === 'n') {
+            sheet[key].v = sheet[key].v.toString();
+            sheet[key].w = sheet[key].v;
         }
     }
 }
 
 // Devuelve el estado de un producto dado su id
 function getInfo (id) {
-    var items = JSON.parse(localStorage.getItem('items'));
-    var processedIds = JSON.parse(localStorage.getItem('processed-ids'));
-    var notProcessedData = JSON.parse(localStorage.getItem('not-processed'));
+    const items = JSON.parse(localStorage.getItem('items'));
+    const processedIds = JSON.parse(localStorage.getItem('processed-ids'));
+    const notProcessedData = JSON.parse(localStorage.getItem('not-processed'));
 
-    let matchedItem = null;
+    const matchedItem = items.find(item => item.id === id);
     let status = 'not-found';
 
-    for (var key in items) {
-        if (items[key].id === id) {
-            matchedItem = items[key];
-
-            var expirationDate = getDate(matchedItem.expiration_date);
-
-            if (isExpired(expirationDate)) {
-                status = 'expired';
-                break;
-            }
-            if (isAboutToExpire(expirationDate)) {
-                status = 'about-to-expire';
-                break;
-            }
+    if (matchedItem) {
+        const expirationDate = getDate(matchedItem.expiration_date);
+        if (isExpired(expirationDate)) {
+            status = 'expired';
+        } else if (isAboutToExpire(expirationDate)) {
+            status = 'about-to-expire';
+        } else {
             status = 'correct';
-            break;
+        }
+
+        const index = notProcessedData.findIndex(item => item.id === id);
+        if (index !== -1) {
+            notProcessedData.splice(index, 1);
         }
     }
 
-    var keyItemId;
-    for (var key in notProcessedData) {
-        keyItemId = notProcessedData[key].id;
-        if (keyItemId === id) {
-            notProcessedData.splice(key, 1);
-            break;
-        }
-    }
-
-    // Procesar localStorage internamente
-    if (processedIds.indexOf(id) === -1) {
+    if (!processedIds.includes(id)) {
         processedIds.push(id);
         localStorage.setItem('processed-ids', JSON.stringify(processedIds));
 
-        var statusData = JSON.parse(localStorage.getItem(status));
-
+        const statusData = JSON.parse(localStorage.getItem(status));
         if (matchedItem) {
             statusData.push(matchedItem);
         } else {
             statusData.push({
-                'code': '',
-                'client_code': '',
-                'client_name': '',
-                'item_description': '',
-                'id': id,
-                'delivery_number': '',
-                'units': '',
-                'delivery_date': '',
-                'expiration_date': '',
-                'days': ''
+                code: '',
+                client_code: '',
+                client_name: '',
+                item_description: '',
+                id: id,
+                delivery_number: '',
+                units: '',
+                delivery_date: '',
+                expiration_date: '',
+                days: ''
             });
         }
 
@@ -403,39 +335,46 @@ function getInfo (id) {
         localStorage.setItem('not-processed', JSON.stringify(notProcessedData));
     }
 
-    return {
-        'status': status,
-        'item': matchedItem
-    }
+    return {status, item: matchedItem};
 }
 
 // Devuelve la fecha de caducidad de un producto como objeto Date
-function getDate (dateString) {
-    if (dateString) {
-        var parts = dateString.split('/');
-        var year = ((parts[2].length) < 4 ? '20' : '') + parts[2];
-        var month = parts[1] - 1;
-        var day = parts[0];
-
-        return new Date(year, month, day);
+// Si no es parseable, devuelve null
+function getDate (dateValue) {
+    if (!dateValue) {
+        return null;
     }
+    if (dateValue instanceof Date) {
+        return isNaN(dateValue.getTime()) ? null : dateValue;
+    }
+    const parts = String(dateValue).split('/');
+    if (parts.length !== 3) {
+        return null;
+    }
+    const year = (parts[2].length < 4 ? '20' : '') + parts[2];
+    const month = parseInt(parts[1], 10) - 1;
+    const day = parseInt(parts[0], 10);
+    const date = new Date(year, month, day);
 
-    return new Date();
-
+    return isNaN(date.getTime()) ? null : date;
 }
 
 // Devuelve si la fecha de caducidad de un producto indica que está caducado
 function isExpired (expirationDate) {
-    var now = new Date();
-
+    if (!expirationDate) {
+        return true;
+    }
+    const now = new Date();
     return expirationDate <= now;
 }
 
 // Devuelve si la fecha de caducidad de un producto indica que está a punto de caducar
 function isAboutToExpire (expirationDate) {
-    var now = new Date();
-
-    var nextMonth = new Date();
+    if (!expirationDate) {
+        return false;
+    }
+    const now = new Date();
+    const nextMonth = new Date();
     nextMonth.setMonth(nextMonth.getMonth() + 3);
 
     return (expirationDate > now) && (expirationDate < nextMonth);
@@ -443,38 +382,33 @@ function isAboutToExpire (expirationDate) {
 
 // Devolver los productos caducados
 function getExpired (items) {
-    var expired = [];
-
-    for (var item of items) {
-        if (item.expiration_date) {
-            var expirationDate = getDate(item.expiration_date);
-            if (isExpired(expirationDate)) {
-                expired.push(item.item_description);
-            }
-        } else {
+    const expired = [];
+    for (const item of items) {
+        if (!item.expiration_date) {
             showErrorInFile();
+            continue;
+        }
+        const expirationDate = getDate(item.expiration_date);
+        if (expirationDate && isExpired(expirationDate)) {
+            expired.push(item.item_description);
         }
     }
-
     return expired;
 }
 
 // Devolver los productos a punto de caducar
 function getAboutToExpire (items) {
-    var aboutToExpire = [];
-
-    for (var item of items) {
-        if (item.expiration_date) {
-            var expirationDate = getDate(item.expiration_date);
-
-            if (isAboutToExpire(expirationDate)) {
-                aboutToExpire.push(item.item_description);
-            }
-        } else {
+    const aboutToExpire = [];
+    for (const item of items) {
+        if (!item.expiration_date) {
             showErrorInFile();
+            continue;
+        }
+        const expirationDate = getDate(item.expiration_date);
+        if (expirationDate && isAboutToExpire(expirationDate)) {
+            aboutToExpire.push(item.item_description);
         }
     }
-
     return aboutToExpire;
 }
 
@@ -495,63 +429,32 @@ function isValid (header) {
 }
 
 function exportToFile() {
-    let nextButton = document.getElementById('next').innerText = 'Generando';
-    // Obtener datos de localStorage
-    var items = JSON.parse(localStorage.getItem('items'));
-    var expired = JSON.parse(localStorage.getItem('expired'));
-    var aboutToExpire = JSON.parse(localStorage.getItem('about-to-expire'));
-    var correct = JSON.parse(localStorage.getItem('correct'));
-    var notProcessed = JSON.parse(localStorage.getItem('not-processed'));
-    var notFound = JSON.parse(localStorage.getItem('not-found'));
-    var header = JSON.parse(localStorage.getItem('header'));
+    const nextButton = document.getElementById('next');
+    nextButton.innerText = 'Generando';
+
+    const items = JSON.parse(localStorage.getItem('items'));
+    const expired = JSON.parse(localStorage.getItem('expired'));
+    const aboutToExpire = JSON.parse(localStorage.getItem('about-to-expire'));
+    const correct = JSON.parse(localStorage.getItem('correct'));
+    const notProcessed = JSON.parse(localStorage.getItem('not-processed'));
+    const notFound = JSON.parse(localStorage.getItem('not-found'));
+    const header = JSON.parse(localStorage.getItem('header'));
 
     // Exportar solo los no caducados en la hoja principal
-    var itemsToExport = [];
-
-    for (var item of items) {
-        var expirationDate = getDate(item.expiration_date);
-        if (!isExpired(expirationDate)) {
-            itemsToExport.push(item);
-        }
-    }
+    const itemsToExport = items.filter(item => !isExpired(getDate(item.expiration_date)));
 
     // Añadir cabeceras del Excel original
-    itemsToExport.unshift(
-      header
-    );
-
-    expired.unshift(
-      header
-    );
-
-    aboutToExpire.unshift(
-      header
-    );
-
-    correct.unshift(
-      header
-    );
-
-    notProcessed.unshift(
-      header
-    );
-
-    notFound.unshift(
-      header
-    );
+    [itemsToExport, expired, aboutToExpire, correct, notProcessed, notFound].forEach(list => list.unshift(header));
 
     // Convertir arrays de JSON de items en hojas de Excel
-    var itemsSheet = XLSX.utils.json_to_sheet(itemsToExport, {skipHeader: true});
-    var expiredSheet = XLSX.utils.json_to_sheet(expired, {skipHeader: true});
-    var aboutToExpireSheet = XLSX.utils.json_to_sheet(aboutToExpire, {skipHeader: true});
-    var correctSheet = XLSX.utils.json_to_sheet(correct, {skipHeader: true});
-    var notProcessedSheet = XLSX.utils.json_to_sheet(notProcessed, {skipHeader: true});
-    var notFoundSheet = XLSX.utils.json_to_sheet(notFound, {skipHeader: true});
+    const itemsSheet = XLSX.utils.json_to_sheet(itemsToExport, {skipHeader: true});
+    const expiredSheet = XLSX.utils.json_to_sheet(expired, {skipHeader: true});
+    const aboutToExpireSheet = XLSX.utils.json_to_sheet(aboutToExpire, {skipHeader: true});
+    const correctSheet = XLSX.utils.json_to_sheet(correct, {skipHeader: true});
+    const notProcessedSheet = XLSX.utils.json_to_sheet(notProcessed, {skipHeader: true});
+    const notFoundSheet = XLSX.utils.json_to_sheet(notFound, {skipHeader: true});
 
-    // Crear la archivo Excel nuevo
-    var wb = XLSX.utils.book_new();
-
-    // Añadir las hojas
+    const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, itemsSheet, 'Productos');
     XLSX.utils.book_append_sheet(wb, expiredSheet, 'Caducados');
     XLSX.utils.book_append_sheet(wb, aboutToExpireSheet, 'A punto de caducar');
@@ -559,47 +462,59 @@ function exportToFile() {
     XLSX.utils.book_append_sheet(wb, notProcessedSheet, 'No procesados');
     XLSX.utils.book_append_sheet(wb, notFoundSheet, 'No encontrados');
 
-    // Exportar a la carpeta de descargas del usuario
-    var filename = 'export_' + Math.round(+new Date()/1000) + '.xlsx';
-    var filepath = path.join(userDataPath, filename);
+    const filename = 'export_' + Math.round(Date.now() / 1000) + '.xlsx';
+    const filepath = path.join(userDataPath, filename);
 
     XLSX.writeFile(wb, filepath, {compression: true});
 
     console.log('Exportado en:', filepath);
-    showExportedMessage(filepath);
+    showExportedMessage();
 }
 
 // Función que muestra un mensaje de éxito cuando la descarga se ha realizado
-function showExportedMessage(downloadPath) {
-    let successMessage = document.getElementById('download-message');
-    let filePath = document.getElementById('filepath');
-    let nextButton = document.getElementById('next');
+function showExportedMessage() {
+    const successMessage = document.getElementById('download-message');
+    const nextButton = document.getElementById('next');
     successMessage.style.top = '125px';
-    // filePath.innerText = downloadPath;
     nextButton.innerText = 'Exportar a excel';
-    setTimeout(function() {
+    setTimeout(() => {
         successMessage.style.top = '-250px';
     }, 20000);
 }
 
 // Obtenemos la lista de items de cada tipo para mostrarlos en el resumen
 function getListsOfItems() {
-    let aboutToExpireItems = JSON.parse(localStorage.getItem('about-to-expire')).length ? JSON.parse(localStorage.getItem('about-to-expire')).length : 0;
-    let correctItems = JSON.parse(localStorage.getItem('correct')).length ? JSON.parse(localStorage.getItem('correct')).length : 0;
-    let expiredItems = JSON.parse(localStorage.getItem('expired')).length ? JSON.parse(localStorage.getItem('expired')).length : 0;
-    let notFoundItems = JSON.parse(localStorage.getItem('not-found')).length ? JSON.parse(localStorage.getItem('not-found')).length : 0;
-    let notProcessedItems = JSON.parse(localStorage.getItem('not-processed')).length ? JSON.parse(localStorage.getItem('not-processed')).length : 0;
+    const counts = {
+        'about-to-expire': JSON.parse(localStorage.getItem('about-to-expire')).length || 0,
+        'correct': JSON.parse(localStorage.getItem('correct')).length || 0,
+        'expired': JSON.parse(localStorage.getItem('expired')).length || 0,
+        'not-found': JSON.parse(localStorage.getItem('not-found')).length || 0,
+        'not-processed': JSON.parse(localStorage.getItem('not-processed')).length || 0
+    };
 
-    document.getElementById('aboutToExpireText').innerText = aboutToExpireItems !== 1 ? aboutToExpireItems + ' elementos a punto de caducar.' : aboutToExpireItems + ' elemento a punto de caducar.';
-    document.getElementById('correcText').innerText = correctItems !== 1 ? correctItems + ' elementos correctos.' : correctItems + ' elemento correcto';
-    document.getElementById('expiredText').innerText = expiredItems !== 1 ? expiredItems + ' elementos caducados.' : expiredItems + ' elemento caducado';
-    document.getElementById('notFoundText').innerText = notFoundItems !== 1 ? notFoundItems + ' elementos no encontrados.' : notFoundItems + ' elemento no encontrado.';
-    document.getElementById('notProcessedText').innerText = notProcessedItems !== 1 ? notProcessedItems + ' elementos no procesados.' : notProcessedItems + ' elemento no procesado.';
+    const labels = {
+        'about-to-expire': {one: 'elemento a punto de caducar.', many: 'elementos a punto de caducar.'},
+        'correct': {one: 'elemento correcto', many: 'elementos correctos.'},
+        'expired': {one: 'elemento caducado.', many: 'elementos caducados.'},
+        'not-found': {one: 'elemento no encontrado.', many: 'elementos no encontrados.'},
+        'not-processed': {one: 'elemento no procesado.', many: 'elementos no procesados.'}
+    };
+
+    const getText = (key, count) => {
+        const label = count === 1 ? labels[key].one : labels[key].many;
+        return `${count} ${label}`;
+    };
+
+    document.getElementById('aboutToExpireText').innerText = getText('about-to-expire', counts['about-to-expire']);
+    document.getElementById('correcText').innerText = getText('correct', counts['correct']);
+    document.getElementById('expiredText').innerText = getText('expired', counts['expired']);
+    document.getElementById('notFoundText').innerText = getText('not-found', counts['not-found']);
+    document.getElementById('notProcessedText').innerText = getText('not-processed', counts['not-processed']);
 }
 
 // Function that show an error if the file contains a product row without expiration_date
 function showErrorInFile() {
-    var errorElement = document.getElementById('format-error-dates');
+    const errorElement = document.getElementById('format-error-dates');
     errorElement.style.display = 'block';
     errorElement.innerText = 'El archivo cargado posee productos sin fecha de caducidad';
 }
