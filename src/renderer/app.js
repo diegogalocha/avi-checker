@@ -35,7 +35,9 @@ function initializeListeners () {
 // o seguir adelante
 async function checkFileAndGetExpired (file) {
     const errorElement = document.getElementById('format-error');
+    const fileNameSpan = document.getElementById('span-input-file');
     if (!file || !file.type) {
+        errorElement.innerText = 'Selecciona un archivo Excel (.xls o .xlsx).';
         errorElement.style.display = 'block';
         return;
     }
@@ -43,11 +45,13 @@ async function checkFileAndGetExpired (file) {
     const response = await loadXls(file);
     if (response.success) {
         errorElement.style.display = 'none';
+        fileNameSpan.innerText = file.name;
         goToPage(true);
         setResumeValues(response.items, response.expiredItems, response.aboutToExpireItems);
     } else {
+        errorElement.innerText = response.message || 'El archivo no tiene el formato correcto';
         errorElement.style.display = 'block';
-        document.getElementById('span-input-file').innerText = 'Seleccione un archivo válido';
+        fileNameSpan.innerText = 'Seleccione un archivo';
     }
 }
 
@@ -180,7 +184,7 @@ function analyzeCode(barCodeInput, value, messageBox, messageBoxText) {
     messageBoxText.innerText = messages[status] || '';
 
     if (sounds[status]) {
-        new Audio(sounds[status]).play();
+        new Audio(sounds[status]).play().catch(() => {});
     }
 
     barCodeInput.value = '';
@@ -188,72 +192,82 @@ function analyzeCode(barCodeInput, value, messageBox, messageBoxText) {
 
 // Función que añade la información del producto a mostrar
 function setProductInfo (item) {
-    let numeroLoteElement = document.getElementById('numero-de-lote');
-    let descripcionElement = document.getElementById('descripcion-articulo');
-    let nombreElement = document.getElementById('nombre-cliente');
-    let fechaElement = document.getElementById('fecha-albaran');
-    let fechaCaducidadElement = document.getElementById('fecha-caducidad');
+    const numeroLoteElement = document.getElementById('numero-de-lote');
+    const descripcionElement = document.getElementById('descripcion-articulo');
+    const nombreElement = document.getElementById('nombre-cliente');
+    const fechaElement = document.getElementById('fecha-albaran');
+    const fechaCaducidadElement = document.getElementById('fecha-caducidad');
     numeroLoteElement.value = item ? item.id : '';
     descripcionElement.value = item ? item.item_description : '';
     nombreElement.value = item ? item.client_name : '';
-    fechaElement.value = item ? item.delivery_date : '';
-    fechaCaducidadElement.value = item ? item.expiration_date : '';
+    fechaElement.value = item ? formatDate(item.delivery_date) : '';
+    fechaCaducidadElement.value = item ? formatDate(item.expiration_date) : '';
 }
 
 // Carga el excel en localStorage y devuelve la lista de productos caducados
 async function loadXls (file) {
-    let workbook;
-    if (file.path) {
-        workbook = XLSX.readFile(file.path, {cellDates: true});
-    } else {
-        const arrayBuffer = await file.arrayBuffer();
-        workbook = XLSX.read(arrayBuffer, {type: 'array', cellDates: true});
-    }
-    const sheet = workbook.Sheets[workbook.SheetNames[0]];
-    const errorElement = document.getElementById('format-error-dates');
-    errorElement.style.display = 'none';
-
-    checkIfColumId(sheet);
-
-    const defaultHeader = [
-        'client_code',
-        'client_name',
-        'code',
-        'item_description',
-        'units',
-        'id',
-        'expiration_date',
-        'delivery_number',
-        'delivery_date',
-        'days'
-    ];
-
-    const items = XLSX.utils.sheet_to_json(sheet, {header: defaultHeader, range: 0, blankrows: true, raw: true});
-    const header = items.shift();
-
-    if (!isValid(header)) {
-        return {
-            success: false
+    try {
+        let workbook;
+        if (file.path) {
+            workbook = XLSX.readFile(file.path, {cellDates: true});
+        } else {
+            const arrayBuffer = await file.arrayBuffer();
+            workbook = XLSX.read(arrayBuffer, {type: 'array', cellDates: true});
         }
-    }
+        const sheet = workbook.Sheets[workbook.SheetNames[0]];
+        const errorElement = document.getElementById('format-error-dates');
+        errorElement.style.display = 'none';
 
-    const expired = getExpired(items);
-    const aboutToExpire = getAboutToExpire(items);
+        checkIfColumId(sheet);
 
-    localStorage.setItem('processed-ids', JSON.stringify([]));
-    localStorage.setItem('expired', JSON.stringify([]));
-    localStorage.setItem('about-to-expire', JSON.stringify([]));
-    localStorage.setItem('correct', JSON.stringify([]));
-    localStorage.setItem('not-found', JSON.stringify([]));
-    localStorage.setItem('not-processed', JSON.stringify(items));
-    localStorage.setItem('items', JSON.stringify(items));
-    localStorage.setItem('header', JSON.stringify(header));
+        const defaultHeader = [
+            'client_code',
+            'client_name',
+            'code',
+            'item_description',
+            'units',
+            'id',
+            'expiration_date',
+            'delivery_number',
+            'delivery_date',
+            'days'
+        ];
 
-    return {
-        success: true,
-        items: items,
-        expiredItems: expired,
-        aboutToExpireItems: aboutToExpire
+        const items = XLSX.utils.sheet_to_json(sheet, {header: defaultHeader, range: 0, blankrows: true, raw: true});
+        const header = items.shift();
+
+        const validation = isValid(header);
+        if (!validation.valid) {
+            return {
+                success: false,
+                message: validation.message
+            }
+        }
+
+        const expired = getExpired(items);
+        const aboutToExpire = getAboutToExpire(items);
+
+        localStorage.setItem('processed-ids', JSON.stringify([]));
+        localStorage.setItem('expired', JSON.stringify([]));
+        localStorage.setItem('about-to-expire', JSON.stringify([]));
+        localStorage.setItem('correct', JSON.stringify([]));
+        localStorage.setItem('not-found', JSON.stringify([]));
+        localStorage.setItem('not-processed', JSON.stringify(items));
+        localStorage.setItem('items', JSON.stringify(items));
+        localStorage.setItem('header', JSON.stringify(header));
+
+        return {
+            success: true,
+            items: items,
+            expiredItems: expired,
+            aboutToExpireItems: aboutToExpire
+        }
+    } catch (error) {
+        console.error('Error cargando Excel:', error);
+        return {
+            success: false,
+            message: 'No se pudo leer el archivo. Asegúrate de que es un Excel válido.'
+        }
     }
 }
 
@@ -359,6 +373,18 @@ function getDate (dateValue) {
     return isNaN(date.getTime()) ? null : date;
 }
 
+// Devuelve una fecha formateada como dd/mm/aaaa para mostrar en pantalla
+function formatDate (dateValue) {
+    const date = getDate(dateValue);
+    if (!date) {
+        return '';
+    }
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const year = date.getFullYear();
+    return `${day}/${month}/${year}`;
+}
+
 // Devuelve si la fecha de caducidad de un producto indica que está caducado
 function isExpired (expirationDate) {
     if (!expirationDate) {
@@ -414,18 +440,36 @@ function getAboutToExpire (items) {
 
 // Devuelve si el contenido del Excel es válido según sus cabeceras
 function isValid (header) {
-    return (
-        (header['client_code'] === 'cliente') &&
-        (header['client_name'] === 'nombre') &&
-        (header['code'] === 'raiz') &&
-        (header['delivery_date'] === 'fecha') &&
-        (header['delivery_number'] === 'numero') &&
-        (header['expiration_date'] === 'caducidad') &&
-        (header['id'] === 'serielot') &&
-        (header['item_description'] === 'descripcio') &&
-        (header['units'] === 'canti_l') &&
-        (header['days'] === 'dias')
-      );
+    const required = {
+        'client_code': 'cliente',
+        'client_name': 'nombre',
+        'code': 'raiz',
+        'delivery_date': 'fecha',
+        'delivery_number': 'numero',
+        'expiration_date': 'caducidad',
+        'id': 'serielot',
+        'item_description': 'descripcio',
+        'units': 'canti_l',
+        'days': 'dias'
+    };
+
+    if (!header) {
+        return {valid: false, message: 'El archivo parece vacío o no contiene cabeceras.'};
+    }
+
+    const missing = [];
+    for (const [key, expected] of Object.entries(required)) {
+        const found = header[key];
+        if (found !== expected) {
+            missing.push(`- Se esperaba "${expected}" en la columna ${key}, pero se encontró "${found || 'vacío'}".`);
+        }
+    }
+
+    if (missing.length === 0) {
+        return {valid: true, message: ''};
+    }
+
+    return {valid: false, message: 'El archivo no tiene el formato esperado. Revisa las cabeceras:\n' + missing.join('\n')};
 }
 
 function exportToFile() {
